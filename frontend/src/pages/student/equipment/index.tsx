@@ -14,9 +14,9 @@ export default function StudentEquipmentPage() {
   const equipment = data?.data || [];
 
   const getAvailabilityTag = (eq: Equipment) => {
-    if (eq.availableQuantity === 0) return <Tag color="red">Hết hàng</Tag>;
-    if (eq.availableQuantity <= 2) return <Tag color="orange">Sắp hết ({eq.availableQuantity})</Tag>;
-    return <Tag color="green">Còn {eq.availableQuantity}</Tag>;
+    if (eq.availableQuantity === 0) return <Tag color="red" style={{ margin: 0 }}>Hết hàng</Tag>;
+    if (eq.availableQuantity <= 2) return <Tag color="orange" style={{ margin: 0 }}>Sắp hết</Tag>;
+    return <Tag color="green" style={{ margin: 0 }}>Còn hàng</Tag>;
   };
 
   const getQuantityClass = (eq: Equipment) => {
@@ -32,14 +32,23 @@ export default function StudentEquipmentPage() {
         <p>Xem và chọn thiết bị bạn muốn mượn</p>
       </div>
 
-      <div style={{ marginBottom: 24 }}>
+      <div style={{
+        position: 'sticky',
+        top: 0,
+        zIndex: 10,
+        background: '#f8fafc',
+        paddingTop: 16,
+        paddingBottom: 16,
+        marginTop: -16,
+        marginBottom: 24,
+      }}>
         <Input
           size="large"
           prefix={<SearchOutlined style={{ color: '#6366f1' }} />}
           placeholder="Tìm kiếm thiết bị..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          style={{ maxWidth: 400, borderRadius: 12 }}
+          style={{ maxWidth: 400, borderRadius: 12, boxShadow: '0 2px 8px rgba(99, 102, 241, 0.05)' }}
           allowClear
         />
       </div>
@@ -84,14 +93,33 @@ export default function StudentEquipmentPage() {
               >
                 <Card.Meta
                   title={
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
-                      <span style={{ fontWeight: 700, fontSize: 14, lineHeight: 1.4 }}>{eq.name}</span>
-                      {getAvailabilityTag(eq)}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', gap: 8, whiteSpace: 'normal' }}>
+                      <span style={{ fontWeight: 700, fontSize: 14, lineHeight: 1.4, flex: 1, wordBreak: 'break-word' }}>
+                        {eq.name}
+                      </span>
+                      <span style={{ flexShrink: 0, display: 'inline-flex' }}>
+                        {getAvailabilityTag(eq)}
+                      </span>
                     </div>
                   }
                   description={
                     <div>
-                      <p style={{ fontSize: 12, color: '#6b7280', marginBottom: 8, minHeight: 36 }}>
+                      <p 
+                        style={{ 
+                          fontSize: 12, 
+                          color: '#6b7280', 
+                          marginBottom: 8, 
+                          height: 36, 
+                          lineHeight: '18px',
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          wordBreak: 'break-word'
+                        }}
+                        title={eq.description || 'Không có mô tả'}
+                      >
                         {eq.description || 'Không có mô tả'}
                       </p>
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>

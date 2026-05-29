@@ -92,6 +92,23 @@ export default function HistoryPage() {
     },
   ];
 
+  const getEmptyDescription = () => {
+    switch (statusFilter) {
+      case 'PENDING':
+        return 'Không có yêu cầu nào đang chờ duyệt';
+      case 'APPROVED':
+        return 'Không có yêu cầu nào đã được duyệt';
+      case 'REJECTED':
+        return 'Không có yêu cầu nào bị từ chối';
+      case 'RETURNED':
+        return 'Không có yêu cầu nào đã trả';
+      case 'OVERDUE':
+        return 'Không có yêu cầu nào bị quá hạn';
+      default:
+        return 'Bạn chưa có yêu cầu mượn thiết bị nào';
+    }
+  };
+
   if (isLoading) return <div style={{ textAlign: 'center', padding: 80 }}><Spin size="large" /></div>;
 
   return (
@@ -133,7 +150,7 @@ export default function HistoryPage() {
       </div>
 
       {filtered.length === 0 ? (
-        <Empty description="Chưa có yêu cầu mượn nào" />
+        <Empty description={getEmptyDescription()} />
       ) : (
         <Table
           columns={columns}

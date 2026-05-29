@@ -2,12 +2,14 @@ package com.btl.clubborrow.service;
 
 import com.btl.clubborrow.dto.request.BorrowCreateRequest;
 import com.btl.clubborrow.dto.request.RejectRequest;
+import com.btl.clubborrow.dto.request.ApproveRequest;
 import com.btl.clubborrow.dto.response.BorrowResponse;
 import com.btl.clubborrow.entity.*;
 import com.btl.clubborrow.exception.ResourceNotFoundException;
 import com.btl.clubborrow.repository.BorrowRequestRepository;
 import com.btl.clubborrow.repository.EquipmentRepository;
 import com.btl.clubborrow.repository.UserRepository;
+import com.btl.clubborrow.scheduler.OverdueCheckScheduler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +28,7 @@ public class BorrowService {
     private final UserRepository userRepository;
     private final NotificationService notificationService;
     private final EmailService emailService;
+    private final OverdueCheckScheduler overdueCheckScheduler;
 
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
@@ -56,18 +59,24 @@ public class BorrowService {
     }
 
     public List<BorrowResponse> getMyBorrows(Long userId) {
+        // Cập nhật trạng thái quá hạn trước khi lấy dữ liệu
+        overdueCheckScheduler.checkOverdueRequests();
+
         return borrowRequestRepository.findByUserIdOrderByCreatedAtDesc(userId)
                 .stream().map(this::toResponse).collect(Collectors.toList());
     }
 
     // ===== Admin =====
     public List<BorrowResponse> getAll() {
+        // Cập nhật trạng thái quá hạn trước khi lấy dữ liệu
+        overdueCheckScheduler.checkOverdueRequests();
+
         return borrowRequestRepository.findAllByOrderByCreatedAtDesc()
                 .stream().map(this::toResponse).collect(Collectors.toList());
     }
 
     @Transactional
-    public BorrowResponse approve(Long id) {
+    public BorrowResponse approve(Long id, ApproveRequest request) {
         BorrowRequest borrow = getBorrowOrThrow(id);
         if (borrow.getStatus() != BorrowStatus.PENDING) {
             throw new RuntimeException("Chỉ có thể duyệt yêu cầu ở trạng thái PENDING");
@@ -83,6 +92,9 @@ public class BorrowService {
         equipmentRepository.save(equipment);
 
         borrow.setStatus(BorrowStatus.APPROVED);
+        if (request != null && request.getAdminNote() != null) {
+            borrow.setAdminNote(request.getAdminNote());
+        }
         borrowRequestRepository.save(borrow);
 
         // Gửi thông báo in-app

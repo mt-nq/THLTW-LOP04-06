@@ -48,16 +48,23 @@ export default function StatisticsPage() {
       label: { autoRotate: true, style: { fontSize: 11 } },
     },
     yAxis: {
-      title: { text: 'Số lượt mượn' },
+      title: { text: 'Số lượng mượn' },
       grid: { line: { style: { stroke: '#f3f4f6' } } },
     },
-    meta: { value: { alias: 'Số lượt mượn' } },
+    meta: { value: { alias: 'Số lượng mượn' } },
     tooltip: {
-      formatter: (d: { name: string; value: number }) => ({ name: 'Số lượt mượn', value: d.value }),
+      formatter: (d: { name: string; value: number }) => ({ name: 'Số lượng mượn', value: d.value }),
     },
   };
 
   const overdueColumns = [
+    {
+      title: 'STT',
+      key: 'index',
+      width: 50,
+      align: 'center' as const,
+      render: (_: unknown, __: unknown, index: number) => index + 1,
+    },
     {
       title: 'Sinh viên',
       key: 'student',
@@ -170,7 +177,7 @@ export default function StatisticsPage() {
               },
               { title: 'Tên thiết bị', dataIndex: 'equipmentName', key: 'equipmentName', render: (n: string) => <strong>{n}</strong> },
               {
-                title: 'Số lượt mượn',
+                title: 'Số lượng mượn',
                 dataIndex: 'borrowCount',
                 key: 'borrowCount',
                 align: 'center',

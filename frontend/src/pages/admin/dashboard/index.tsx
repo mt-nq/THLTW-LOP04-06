@@ -88,6 +88,13 @@ export default function AdminDashboard() {
               pagination={false}
               columns={[
                 {
+                  title: 'STT',
+                  key: 'index',
+                  width: 50,
+                  align: 'center' as const,
+                  render: (_: unknown, __: unknown, index: number) => index + 1,
+                },
+                {
                   title: 'Sinh viên',
                   dataIndex: 'userName',
                   render: (name: string, r: BorrowResponse) => (
@@ -146,7 +153,7 @@ export default function AdminDashboard() {
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontWeight: 600, fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.equipmentName}</div>
                     </div>
-                    <Tag color="purple" style={{ flexShrink: 0 }}>{item.borrowCount} lần</Tag>
+                    <Tag color="purple" style={{ flexShrink: 0 }}>SL: {item.borrowCount}</Tag>
                   </div>
                 ))}
               </div>

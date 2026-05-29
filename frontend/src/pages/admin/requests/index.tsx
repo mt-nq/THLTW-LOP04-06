@@ -23,6 +23,8 @@ export default function AdminRequestsPage() {
   const [returnBorrow] = useReturnBorrowMutation();
 
   const [activeTab, setActiveTab] = useState<string>('ALL');
+  const [approveModal, setApproveModal] = useState<{ open: boolean; id: number | null }>({ open: false, id: null });
+  const [approveNote, setApproveNote] = useState('');
   const [rejectModal, setRejectModal] = useState<{ open: boolean; id: number | null }>({ open: false, id: null });
   const [rejectNote, setRejectNote] = useState('');
   const [detailModal, setDetailModal] = useState<BorrowResponse | null>(null);
@@ -33,10 +35,13 @@ export default function AdminRequestsPage() {
     ? allBorrows
     : allBorrows.filter((b) => b.status === activeTab);
 
-  const handleApprove = async (id: number) => {
+  const handleApprove = async () => {
+    if (!approveModal.id) return;
     try {
-      await approve(id).unwrap();
+      await approve({ id: approveModal.id, adminNote: approveNote }).unwrap();
       message.success('✅ Đã duyệt yêu cầu và gửi email thông báo');
+      setApproveModal({ open: false, id: null });
+      setApproveNote('');
     } catch (err: unknown) {
       const error = err as { data?: { message?: string } };
       message.error(error?.data?.message || 'Duyệt thất bại');
@@ -78,9 +83,17 @@ export default function AdminRequestsPage() {
     APPROVED: allBorrows.filter(b => b.status === 'APPROVED').length,
     OVERDUE: allBorrows.filter(b => b.status === 'OVERDUE').length,
     RETURNED: allBorrows.filter(b => b.status === 'RETURNED').length,
+    REJECTED: allBorrows.filter(b => b.status === 'REJECTED').length,
   };
 
   const columns = [
+    {
+      title: 'STT',
+      key: 'index',
+      width: 50,
+      align: 'center' as const,
+      render: (_: unknown, __: unknown, index: number) => index + 1,
+    },
     {
       title: 'Sinh viên',
       key: 'student',
@@ -140,7 +153,7 @@ export default function AdminRequestsPage() {
             <>
               <Tooltip title="Duyệt">
                 <Button size="small" type="primary" icon={<CheckCircleOutlined />}
-                  onClick={() => handleApprove(r.id)} style={{ background: '#10b981', borderColor: '#10b981' }} />
+                  onClick={() => setApproveModal({ open: true, id: r.id })} style={{ background: '#10b981', borderColor: '#10b981' }} />
               </Tooltip>
               <Tooltip title="Từ chối">
                 <Button size="small" danger icon={<CloseCircleOutlined />}
@@ -176,6 +189,7 @@ export default function AdminRequestsPage() {
           { key: 'APPROVED', label: <span style={{ color: '#3b82f6' }}>✅ Đang mượn ({tabCounts.APPROVED})</span> },
           { key: 'OVERDUE', label: <span style={{ color: '#ef4444' }}>🚨 Quá hạn ({tabCounts.OVERDUE})</span> },
           { key: 'RETURNED', label: `✔️ Đã trả (${tabCounts.RETURNED})` },
+          { key: 'REJECTED', label: <span style={{ color: '#9ca3af' }}>❌ Từ chối ({tabCounts.REJECTED})</span> },
         ]}
         style={{ marginBottom: 16 }}
       />
@@ -195,6 +209,26 @@ export default function AdminRequestsPage() {
           }
         />
       )}
+
+      {/* Approve Modal */}
+      <Modal
+        title="✅ Duyệt yêu cầu mượn"
+        open={approveModal.open}
+        onOk={handleApprove}
+        onCancel={() => { setApproveModal({ open: false, id: null }); setApproveNote(''); }}
+        okText="Xác nhận duyệt"
+        okButtonProps={{ style: { background: '#10b981', borderColor: '#10b981' } }}
+        cancelText="Huỷ"
+      >
+        <p style={{ marginBottom: 12, color: '#374151' }}>Nhập ghi chú duyệt thiết bị (tuỳ chọn):</p>
+        <Input.TextArea
+          rows={3}
+          value={approveNote}
+          onChange={(e) => setApproveNote(e.target.value)}
+          placeholder="Ví dụ: Thiết bị đã được sạc đầy, vui lòng kiểm tra trước khi nhận..."
+          style={{ borderRadius: 10 }}
+        />
+      </Modal>
 
       {/* Reject Modal */}
       <Modal

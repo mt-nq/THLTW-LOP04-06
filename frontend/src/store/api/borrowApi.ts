@@ -15,8 +15,8 @@ export const borrowApi = baseApi.injectEndpoints({
       query: (body) => ({ url: '/api/borrows', method: 'POST', body }),
       invalidatesTags: ['Borrow', 'Equipment'],
     }),
-    approveBorrow: builder.mutation<ApiResponse<BorrowResponse>, number>({
-      query: (id) => ({ url: `/api/borrows/${id}/approve`, method: 'PUT' }),
+    approveBorrow: builder.mutation<ApiResponse<BorrowResponse>, { id: number; adminNote?: string }>({
+      query: ({ id, adminNote }) => ({ url: `/api/borrows/${id}/approve`, method: 'PUT', body: { adminNote } }),
       invalidatesTags: ['Borrow', 'Equipment', 'Statistics'],
     }),
     rejectBorrow: builder.mutation<ApiResponse<BorrowResponse>, { id: number; adminNote?: string }>({

@@ -2,6 +2,7 @@ package com.btl.clubborrow.controller;
 
 import com.btl.clubborrow.dto.request.BorrowCreateRequest;
 import com.btl.clubborrow.dto.request.RejectRequest;
+import com.btl.clubborrow.dto.request.ApproveRequest;
 import com.btl.clubborrow.dto.response.ApiResponse;
 import com.btl.clubborrow.dto.response.BorrowResponse;
 import com.btl.clubborrow.entity.User;
@@ -51,8 +52,9 @@ public class BorrowController {
     // Admin: duyệt yêu cầu
     @PutMapping("/{id}/approve")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<BorrowResponse>> approve(@PathVariable Long id) {
-        return ResponseEntity.ok(ApiResponse.success("Duyệt yêu cầu thành công", borrowService.approve(id)));
+    public ResponseEntity<ApiResponse<BorrowResponse>> approve(
+            @PathVariable Long id, @RequestBody(required = false) ApproveRequest request) {
+        return ResponseEntity.ok(ApiResponse.success("Duyệt yêu cầu thành công", borrowService.approve(id, request)));
     }
 
     // Admin: từ chối yêu cầu

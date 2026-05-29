@@ -24,6 +24,13 @@ export default function HistoryPage() {
 
   const columns = [
     {
+      title: 'STT',
+      key: 'index',
+      width: 50,
+      align: 'center' as const,
+      render: (_: unknown, __: unknown, index: number) => index + 1,
+    },
+    {
       title: 'Thiết bị',
       dataIndex: 'equipmentName',
       key: 'equipmentName',
@@ -156,7 +163,6 @@ export default function HistoryPage() {
           columns={columns}
           dataSource={filtered}
           rowKey="id"
-          pagination={{ pageSize: 10, showTotal: (total) => `Tổng ${total} yêu cầu` }}
           scroll={{ x: 700 }}
           style={{ background: '#fff', borderRadius: 16 }}
         />

@@ -39,7 +39,18 @@ export default function LoginPage() {
     <div className="auth-page">
       <div className="auth-card">
         <div className="auth-logo">
-          <div className="auth-logo-icon">📚</div>
+          <div className="auth-logo-icon">
+            <img
+              src="https://tse3.mm.bing.net/th/id/OIP.RjZcMPjW1gO4lp8xOM66IgHaHa?cb=thfvnextfalcon&rs=1&pid=ImgDetMain&o=7&rm=3"
+              alt="Logo"
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain',
+                borderRadius: '50%',
+              }}
+            />
+          </div>
           <h1>CLB Borrow</h1>
           <p>Hệ thống quản lý mượn đồ dùng</p>
         </div>

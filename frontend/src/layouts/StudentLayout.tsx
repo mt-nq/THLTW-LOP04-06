@@ -62,7 +62,18 @@ export default function StudentLayout() {
     <Layout className="app-layout">
       <Sider width={240} className="app-sider" theme="dark" breakpoint="lg" collapsedWidth={0}>
         <div className="sider-logo">
-          <div className="sider-logo-icon">📚</div>
+          <div className="sider-logo-icon">
+            <img
+              src="https://tse3.mm.bing.net/th/id/OIP.RjZcMPjW1gO4lp8xOM66IgHaHa?cb=thfvnextfalcon&rs=1&pid=ImgDetMain&o=7&rm=3"
+              alt="Logo"
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain',
+                borderRadius: '50%',
+              }}
+            />
+          </div>
           <div className="sider-logo-text">
             <h2>CLB Borrow</h2>
             <p>Sinh viên</p>

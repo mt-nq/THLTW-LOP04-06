@@ -57,7 +57,7 @@ export default function AdminDashboard() {
 
       {overdueBorrows.length > 0 && (
         <Alert
-          message={`🚨 Cảnh báo: Có ${overdueBorrows.length} yêu cầu quá hạn trả!`}
+          message={`Cảnh báo: Có ${overdueBorrows.length} yêu cầu quá hạn trả!`}
           description="Vui lòng kiểm tra và xử lý các yêu cầu quá hạn."
           type="error"
           showIcon

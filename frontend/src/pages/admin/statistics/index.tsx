@@ -131,7 +131,7 @@ export default function StatisticsPage() {
                 value={year}
                 onChange={setYear}
                 options={years}
-                style={{ width: 100 }}
+                style={{ width: 120 }}
               />
             </div>
           </div>

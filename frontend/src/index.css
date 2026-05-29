@@ -122,6 +122,7 @@ body {
   font-weight: 800;
   background: linear-gradient(135deg, #1e1b4b, #6366f1);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -132,9 +133,40 @@ body {
 }
 
 /* ===== LAYOUT ===== */
+.app-layout {
+  height: 100vh !important;
+  overflow: hidden !important;
+}
+
 .app-sider {
   background: linear-gradient(180deg, #1e1b4b 0%, #312e81 100%);
   box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+  height: 100vh !important;
+  overflow-y: auto !important;
+}
+
+.app-main-layout {
+  height: 100vh !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.app-header {
+  background: #fff;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  flex-shrink: 0 !important;
+  z-index: 100;
+}
+
+.app-content {
+  background: #f8fafc;
+  overflow-y: auto !important;
+  flex: 1 !important;
 }
 
 .sider-logo {
@@ -170,17 +202,7 @@ body {
   margin: 0;
 }
 
-.app-header {
-  background: #fff;
-  padding: 0 24px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
+
 
 .header-title {
   font-size: 18px;

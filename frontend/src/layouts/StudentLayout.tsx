@@ -59,7 +59,7 @@ export default function StudentLayout() {
   };
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout className="app-layout">
       <Sider width={240} className="app-sider" theme="dark" breakpoint="lg" collapsedWidth={0}>
         <div className="sider-logo">
           <div className="sider-logo-icon">📚</div>
@@ -78,7 +78,7 @@ export default function StudentLayout() {
         />
       </Sider>
 
-      <Layout>
+      <Layout className="app-main-layout">
         <Header className="app-header" style={{ height: 64 }}>
           <h2 className="header-title">{pageTitles[location.pathname] || 'CLB Borrow'}</h2>
           <div className="header-right">
@@ -94,7 +94,7 @@ export default function StudentLayout() {
           </div>
         </Header>
 
-        <Content style={{ background: '#f8fafc', minHeight: 'calc(100vh - 64px)' }}>
+        <Content className="app-content">
           <Outlet />
         </Content>
       </Layout>

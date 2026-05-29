@@ -63,6 +63,13 @@ export default function AdminEquipmentPage() {
 
   const columns = [
     {
+      title: 'STT',
+      key: 'index',
+      width: 50,
+      align: 'center' as const,
+      render: (_: unknown, __: unknown, index: number) => index + 1,
+    },
+    {
       title: 'Thiết bị',
       key: 'name',
       render: (_: unknown, eq: Equipment) => (

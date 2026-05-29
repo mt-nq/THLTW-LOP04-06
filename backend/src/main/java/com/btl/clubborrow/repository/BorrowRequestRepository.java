@@ -26,14 +26,18 @@ public interface BorrowRequestRepository extends JpaRepository<BorrowRequest, Lo
     List<BorrowRequest> findByStatusAndReturnDateBefore(BorrowStatus status, LocalDate date);
 
     // Thống kê thiết bị mượn nhiều trong tháng
-    @Query("SELECT b.equipment.id, b.equipment.name, COUNT(b) as borrowCount " +
+    @Query("SELECT b.equipment.id, b.equipment.name, SUM(b.quantity) as borrowCount " +
            "FROM BorrowRequest b " +
            "WHERE MONTH(b.createdAt) = :month AND YEAR(b.createdAt) = :year " +
-           "AND b.status IN ('APPROVED', 'RETURNED') " +
+           "AND b.status IN ('APPROVED', 'RETURNED', 'OVERDUE') " +
            "GROUP BY b.equipment.id, b.equipment.name " +
            "ORDER BY borrowCount DESC")
     List<Object[]> findMonthlyStatistics(@Param("month") int month, @Param("year") int year);
 
     // Đếm tổng đang mượn (APPROVED)
     long countByStatus(BorrowStatus status);
+
+    // Tính tổng số lượng thiết bị theo trạng thái
+    @Query("SELECT COALESCE(SUM(b.quantity), 0) FROM BorrowRequest b WHERE b.status = :status")
+    long sumQuantityByStatus(@Param("status") BorrowStatus status);
 }

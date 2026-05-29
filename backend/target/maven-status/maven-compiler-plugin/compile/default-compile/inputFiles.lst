@@ -18,6 +18,7 @@ C:\Users\admin\2.2\BTL\backend\src\main\java\com\btl\clubborrow\repository\Borro
 C:\Users\admin\2.2\BTL\backend\src\main\java\com\btl\clubborrow\controller\NotificationController.java
 C:\Users\admin\2.2\BTL\backend\src\main\java\com\btl\clubborrow\dto\response\EquipmentResponse.java
 C:\Users\admin\2.2\BTL\backend\src\main\java\com\btl\clubborrow\entity\Notification.java
+C:\Users\admin\2.2\BTL\backend\src\main\java\com\btl\clubborrow\dto\request\ApproveRequest.java
 C:\Users\admin\2.2\BTL\backend\src\main\java\com\btl\clubborrow\repository\EquipmentRepository.java
 C:\Users\admin\2.2\BTL\backend\src\main\java\com\btl\clubborrow\controller\AuthController.java
 C:\Users\admin\2.2\BTL\backend\src\main\java\com\btl\clubborrow\exception\GlobalExceptionHandler.java

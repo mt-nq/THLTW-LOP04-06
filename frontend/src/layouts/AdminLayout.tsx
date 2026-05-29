@@ -12,8 +12,6 @@ import {
 } from '@ant-design/icons';
 import { logout } from '@/store/slices/authSlice';
 import { RootState } from '@/store';
-import { useGetUnreadCountQuery } from '@/store/api/notificationApi';
-import NotificationBell from '@/components/NotificationBell';
 
 const { Sider, Content, Header } = Layout;
 
@@ -36,7 +34,6 @@ export default function AdminLayout() {
   const location = useLocation();
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.auth.user);
-  const { data: unreadData } = useGetUnreadCountQuery(undefined, { pollingInterval: 30000 });
 
   const handleLogout = () => {
     dispatch(logout());
@@ -57,7 +54,7 @@ export default function AdminLayout() {
   };
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout className="app-layout">
       <Sider width={240} className="app-sider" theme="dark" breakpoint="lg" collapsedWidth={0}>
         <div className="sider-logo">
           <div className="sider-logo-icon">⚙️</div>
@@ -76,11 +73,10 @@ export default function AdminLayout() {
         />
       </Sider>
 
-      <Layout>
+      <Layout className="app-main-layout">
         <Header className="app-header" style={{ height: 64 }}>
           <h2 className="header-title">{pageTitles[location.pathname] || 'Admin'}</h2>
           <div className="header-right">
-            <NotificationBell unreadCount={unreadData?.data?.count || 0} />
             <Dropdown menu={userMenu} placement="bottomRight" arrow>
               <div className="user-info">
                 <Avatar style={{ background: 'linear-gradient(135deg, #10b981, #059669)' }}>
@@ -92,7 +88,7 @@ export default function AdminLayout() {
           </div>
         </Header>
 
-        <Content style={{ background: '#f8fafc', minHeight: 'calc(100vh - 64px)' }}>
+        <Content className="app-content">
           <Outlet />
         </Content>
       </Layout>

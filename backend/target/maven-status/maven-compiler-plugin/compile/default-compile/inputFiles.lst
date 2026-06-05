@@ -35,6 +35,7 @@ C:\Users\admin\2.2\BTL\backend\src\main\java\com\btl\clubborrow\config\DataIniti
 C:\Users\admin\2.2\BTL\backend\src\main\java\com\btl\clubborrow\dto\response\NotificationResponse.java
 C:\Users\admin\2.2\BTL\backend\src\main\java\com\btl\clubborrow\exception\ResourceNotFoundException.java
 C:\Users\admin\2.2\BTL\backend\src\main\java\com\btl\clubborrow\dto\request\LoginRequest.java
+C:\Users\admin\2.2\BTL\backend\src\main\java\com\btl\clubborrow\dto\request\RegisterRequest.java
 C:\Users\admin\2.2\BTL\backend\src\main\java\com\btl\clubborrow\config\SecurityConfig.java
 C:\Users\admin\2.2\BTL\backend\src\main\java\com\btl\clubborrow\controller\BorrowController.java
 C:\Users\admin\2.2\BTL\backend\src\main\java\com\btl\clubborrow\repository\UserRepository.java

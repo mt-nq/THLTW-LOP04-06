@@ -9,6 +9,7 @@ import App from './App';
 import './index.css';
 import dayjs from 'dayjs';
 import 'dayjs/locale/vi';
+import { theme } from 'antd';
 
 dayjs.locale('vi');
 
@@ -19,8 +20,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <ConfigProvider
           locale={viVN}
           theme={{
+            algorithm: theme.darkAlgorithm,
             token: {
-              colorPrimary: '#6366f1',
+              colorPrimary: '#e50914',
               colorSuccess: '#10b981',
               colorWarning: '#f59e0b',
               colorError: '#ef4444',
@@ -31,13 +33,15 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             },
             components: {
               Layout: {
-                siderBg: '#1e1b4b',
-                triggerBg: '#312e81',
+                siderBg: '#121212',
+                triggerBg: '#1a1a1a',
+                bodyBg: 'transparent',
+                headerBg: 'transparent',
               },
               Menu: {
-                darkItemBg: '#1e1b4b',
-                darkItemSelectedBg: '#4f46e5',
-                darkItemHoverBg: '#312e81',
+                darkItemBg: '#121212',
+                darkItemSelectedBg: 'rgba(229,9,20,0.15)',
+                darkItemHoverBg: 'rgba(255,255,255,0.05)',
               },
             },
           }}

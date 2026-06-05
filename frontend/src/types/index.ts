@@ -12,6 +12,13 @@ export interface LoginRequest {
   password: string;
 }
 
+export interface RegisterRequest {
+  name: string;
+  email: string;
+  password: string;
+  studentId: string;
+}
+
 export interface LoginResponse {
   token: string;
   id: number;

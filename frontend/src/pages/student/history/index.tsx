@@ -1,9 +1,8 @@
-import { Table, Tag, Button, Space, Tooltip, Empty, Spin, Select, Row, Col, Statistic, Card } from 'antd';
-import { EyeOutlined } from '@ant-design/icons';
+import { Table, Select, Empty, Spin } from 'antd';
 import { useState } from 'react';
 import { useGetMyBorrowsQuery } from '@/store/api/borrowApi';
 import { BorrowResponse, BorrowStatus } from '@/types';
-import { BORROW_STATUS_COLORS, BORROW_STATUS_LABELS } from '@/utils/constants';
+import { BORROW_STATUS_LABELS } from '@/utils/constants';
 import dayjs from 'dayjs';
 
 export default function HistoryPage() {
@@ -26,147 +25,143 @@ export default function HistoryPage() {
     {
       title: 'STT',
       key: 'index',
-      width: 50,
+      width: 60,
       align: 'center' as const,
-      render: (_: unknown, __: unknown, index: number) => index + 1,
+      render: (_: unknown, __: unknown, index: number) => <span className="font-bold text-gray-500">{index + 1}</span>,
     },
     {
       title: 'Thiết bị',
       dataIndex: 'equipmentName',
       key: 'equipmentName',
       render: (name: string, record: BorrowResponse) => (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          {record.equipmentImageUrl && (
-            <img src={record.equipmentImageUrl} alt={name}
-              style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 8 }} />
+        <div className="flex items-center gap-3">
+          {record.equipmentImageUrl ? (
+            <img src={record.equipmentImageUrl} alt={name} className="w-10 h-10 object-cover rounded-md border border-white/10" />
+          ) : (
+            <div className="w-10 h-10 bg-gray-900 rounded-md border border-white/10 flex items-center justify-center text-gray-500">
+              <i className="fa-solid fa-box"></i>
+            </div>
           )}
           <div>
-            <div style={{ fontWeight: 600, fontSize: 13 }}>{name}</div>
-            <div style={{ fontSize: 12, color: '#6b7280' }}>SL: {record.quantity}</div>
+            <div className="font-bold text-gray-100 text-sm">{name}</div>
+            <div className="text-[11px] text-gray-500 font-mono">SL: {record.quantity}</div>
           </div>
         </div>
       ),
     },
     {
-      title: 'Ngày mượn',
-      dataIndex: 'borrowDate',
-      key: 'borrowDate',
-      render: (date: string) => dayjs(date).format('DD/MM/YYYY'),
-    },
-    {
-      title: 'Ngày trả',
-      dataIndex: 'returnDate',
-      key: 'returnDate',
-      render: (date: string, record: BorrowResponse) => {
-        const isOverdue = record.status === 'APPROVED' && dayjs(date).isBefore(dayjs(), 'day');
+      title: 'Thời gian mượn',
+      key: 'time',
+      render: (_: unknown, record: BorrowResponse) => {
+        const isOverdue = record.status === 'APPROVED' && dayjs(record.returnDate).isBefore(dayjs(), 'day');
         return (
-          <span style={{ color: isOverdue ? '#ef4444' : undefined, fontWeight: isOverdue ? 700 : 400 }}>
-            {dayjs(date).format('DD/MM/YYYY')}
-            {isOverdue && ' ⚠️'}
-          </span>
+          <div className="text-xs">
+            <div className="text-gray-400">Từ: <span className="text-gray-200">{dayjs(record.borrowDate).format('DD/MM/YYYY')}</span></div>
+            <div className={`${isOverdue ? 'text-red-400 font-bold' : 'text-gray-400'}`}>
+              Đến: <span className={isOverdue ? 'text-red-400' : 'text-gray-200'}>{dayjs(record.returnDate).format('DD/MM/YYYY')}</span>
+              {isOverdue && ' ⚠️'}
+            </div>
+          </div>
         );
-      },
+      }
     },
     {
       title: 'Trạng thái',
       dataIndex: 'status',
       key: 'status',
-      render: (status: BorrowStatus) => (
-        <Tag color={BORROW_STATUS_COLORS[status]} style={{ borderRadius: 6, fontWeight: 600 }}>
-          {BORROW_STATUS_LABELS[status]}
-        </Tag>
-      ),
-    },
-    {
-      title: 'Ghi chú admin',
-      dataIndex: 'adminNote',
-      key: 'adminNote',
-      render: (note: string) => note ? (
-        <Tooltip title={note}>
-          <span style={{ fontSize: 12, color: '#ef4444', cursor: 'help' }}>
-            {note.length > 30 ? note.substring(0, 30) + '...' : note}
+      render: (status: BorrowStatus) => {
+        let colors = '';
+        switch(status) {
+          case 'PENDING': colors = 'bg-amber-500/10 text-amber-400 border-amber-500/20'; break;
+          case 'APPROVED': colors = 'bg-blue-500/10 text-blue-400 border-blue-500/20'; break;
+          case 'RETURNED': colors = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'; break;
+          case 'OVERDUE': colors = 'bg-red-500/10 text-red-400 border-red-500/20'; break;
+          case 'REJECTED': colors = 'bg-gray-500/10 text-gray-400 border-gray-500/20'; break;
+        }
+        return (
+          <span className={`text-[10px] font-extrabold px-2.5 py-1 rounded-full border uppercase tracking-wider ${colors}`}>
+            {status === 'PENDING' && <i className="fa-solid fa-hourglass-start animate-spin mr-1"></i>}
+            {BORROW_STATUS_LABELS[status]}
           </span>
-        </Tooltip>
-      ) : <span style={{ color: '#d1d5db' }}>—</span>,
+        );
+      },
     },
     {
-      title: 'Ngày gửi',
+      title: 'Ngày gửi đơn',
       dataIndex: 'createdAt',
       key: 'createdAt',
-      render: (date: string) => dayjs(date).format('DD/MM/YYYY HH:mm'),
-      sorter: (a: BorrowResponse, b: BorrowResponse) =>
-        dayjs(b.createdAt).unix() - dayjs(a.createdAt).unix(),
+      render: (date: string) => <span className="text-xs text-gray-400">{dayjs(date).format('DD/MM/YYYY HH:mm')}</span>,
+      sorter: (a: BorrowResponse, b: BorrowResponse) => dayjs(b.createdAt).unix() - dayjs(a.createdAt).unix(),
     },
   ];
 
-  const getEmptyDescription = () => {
-    switch (statusFilter) {
-      case 'PENDING':
-        return 'Không có yêu cầu nào đang chờ duyệt';
-      case 'APPROVED':
-        return 'Không có yêu cầu nào đã được duyệt';
-      case 'REJECTED':
-        return 'Không có yêu cầu nào bị từ chối';
-      case 'RETURNED':
-        return 'Không có yêu cầu nào đã trả';
-      case 'OVERDUE':
-        return 'Không có yêu cầu nào bị quá hạn';
-      default:
-        return 'Bạn chưa có yêu cầu mượn thiết bị nào';
-    }
-  };
-
-  if (isLoading) return <div style={{ textAlign: 'center', padding: 80 }}><Spin size="large" /></div>;
+  if (isLoading) return <div className="h-screen flex items-center justify-center"><Spin size="large" /></div>;
 
   return (
-    <div className="page-content">
-      <div className="page-header">
-        <h1>📜 Lịch Sử Mượn</h1>
-        <p>Theo dõi tất cả yêu cầu mượn của bạn</p>
-      </div>
+    <div className="min-h-screen bg-[#0c0c0c] text-gray-100 p-6 md:p-12">
+      <div className="max-w-6xl mx-auto">
+        <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-black tracking-tight text-white flex items-center gap-3">
+              <span className="text-[#e50914]"><i className="fa-solid fa-clock-rotate-left"></i></span>
+              LỊCH SỬ MƯỢN ĐỒ
+            </h1>
+            <p className="text-gray-400 mt-2 text-sm">Theo dõi tiến trình và trạng thái các yêu cầu mượn thiết bị của bạn.</p>
+          </div>
+          
+          <Select
+            value={statusFilter}
+            onChange={setStatusFilter}
+            className="w-full md:w-48"
+            size="large"
+            options={[
+              { value: 'ALL', label: 'Tất cả trạng thái' },
+              ...Object.entries(BORROW_STATUS_LABELS).map(([value, label]) => ({ value, label })),
+            ]}
+          />
+        </div>
 
-      <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-        {[
-          { title: 'Tổng yêu cầu', value: stats.total, color: '#6366f1' },
-          { title: 'Chờ duyệt', value: stats.pending, color: '#f59e0b' },
-          { title: 'Đang mượn', value: stats.approved, color: '#3b82f6' },
-          { title: 'Quá hạn', value: stats.overdue, color: '#ef4444' },
-        ].map((s) => (
-          <Col key={s.title} xs={12} md={6}>
-            <Card style={{ borderRadius: 12, textAlign: 'center', borderTop: `3px solid ${s.color}` }}>
-              <Statistic
-                title={<span style={{ fontSize: 12 }}>{s.title}</span>}
-                value={s.value}
-                valueStyle={{ color: s.color, fontWeight: 800, fontSize: 28 }}
+        {/* STATS CARDS */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="bg-[#121212] border-t-4 border-t-indigo-500 border border-white/5 rounded-xl p-4 text-center hover:bg-[#161616] transition">
+            <div className="text-gray-500 text-xs font-bold uppercase tracking-wider mb-1">Tổng Phiếu</div>
+            <div className="text-3xl font-black text-indigo-400">{stats.total}</div>
+          </div>
+          <div className="bg-[#121212] border-t-4 border-t-amber-500 border border-white/5 rounded-xl p-4 text-center hover:bg-[#161616] transition">
+            <div className="text-gray-500 text-xs font-bold uppercase tracking-wider mb-1">Chờ Duyệt</div>
+            <div className="text-3xl font-black text-amber-400">{stats.pending}</div>
+          </div>
+          <div className="bg-[#121212] border-t-4 border-t-blue-500 border border-white/5 rounded-xl p-4 text-center hover:bg-[#161616] transition">
+            <div className="text-gray-500 text-xs font-bold uppercase tracking-wider mb-1">Đang Mượn</div>
+            <div className="text-3xl font-black text-blue-400">{stats.approved}</div>
+          </div>
+          <div className="bg-[#121212] border-t-4 border-t-red-500 border border-white/5 rounded-xl p-4 text-center hover:bg-[#161616] transition">
+            <div className="text-gray-500 text-xs font-bold uppercase tracking-wider mb-1">Quá Hạn</div>
+            <div className="text-3xl font-black text-red-500">{stats.overdue}</div>
+          </div>
+        </div>
+
+        {/* TABLE */}
+        <div className="bg-[#141414] border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
+          {filtered.length === 0 ? (
+            <div className="p-16 text-center">
+              <Empty 
+                description={<span className="text-gray-500 font-medium">Không tìm thấy yêu cầu mượn nào</span>} 
+                image={Empty.PRESENTED_IMAGE_SIMPLE} 
               />
-            </Card>
-          </Col>
-        ))}
-      </Row>
-
-      <div style={{ marginBottom: 16 }}>
-        <Select
-          value={statusFilter}
-          onChange={setStatusFilter}
-          style={{ width: 180, borderRadius: 10 }}
-          options={[
-            { value: 'ALL', label: 'Tất cả trạng thái' },
-            ...Object.entries(BORROW_STATUS_LABELS).map(([value, label]) => ({ value, label })),
-          ]}
-        />
+            </div>
+          ) : (
+            <Table
+              columns={columns}
+              dataSource={filtered}
+              rowKey="id"
+              scroll={{ x: 800 }}
+              pagination={{ pageSize: 10 }}
+              className="dark-theme-table"
+            />
+          )}
+        </div>
       </div>
-
-      {filtered.length === 0 ? (
-        <Empty description={getEmptyDescription()} />
-      ) : (
-        <Table
-          columns={columns}
-          dataSource={filtered}
-          rowKey="id"
-          scroll={{ x: 700 }}
-          style={{ background: '#fff', borderRadius: 16 }}
-        />
-      )}
     </div>
   );
 }

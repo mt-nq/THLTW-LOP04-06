@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { Row, Col, Card, Select, Table, Tag, Alert, Spin, Empty } from 'antd';
+import { Select, Table, Tag, Alert, Spin, Empty } from 'antd';
 import { Column } from '@ant-design/charts';
 import { useGetMonthlyStatsQuery, useGetOverdueQuery } from '@/store/api/statisticsApi';
 import { BorrowResponse } from '@/types';
-import { BORROW_STATUS_COLORS, BORROW_STATUS_LABELS } from '@/utils/constants';
+import { BORROW_STATUS_LABELS } from '@/utils/constants';
 import dayjs from 'dayjs';
 
 const currentMonth = dayjs().month() + 1;
@@ -35,25 +35,31 @@ export default function StatisticsPage() {
     data: chartData,
     xField: 'name',
     yField: 'value',
-    color: '#6366f1',
+    color: '#e50914',
     columnStyle: {
-      radius: [8, 8, 0, 0],
-      fill: 'l(90) 0:#818cf8 1:#4f46e5',
+      radius: [4, 4, 0, 0],
+      fill: 'l(90) 0:#b1060f 1:#e50914',
     },
     label: {
       position: 'top' as const,
-      style: { fontWeight: 700, fill: '#4f46e5' },
+      style: { fontWeight: 900, fill: '#fff' },
     },
     xAxis: {
-      label: { autoRotate: true, style: { fontSize: 11 } },
+      label: { autoRotate: true, style: { fill: '#9ca3af', fontSize: 10, fontWeight: 700 } },
     },
     yAxis: {
-      title: { text: 'Số lượng mượn' },
-      grid: { line: { style: { stroke: '#f3f4f6' } } },
+      label: { style: { fill: '#9ca3af' } },
+      grid: { line: { style: { stroke: 'rgba(255,255,255,0.05)' } } },
     },
-    meta: { value: { alias: 'Số lượng mượn' } },
+    meta: { value: { alias: 'Số lượt mượn' } },
     tooltip: {
-      formatter: (d: { name: string; value: number }) => ({ name: 'Số lượng mượn', value: d.value }),
+      formatter: (d: { name: string; value: number }) => ({ name: 'Số lượt', value: d.value }),
+      customContent: (title: string, data: any[]) => {
+        return `<div style="background: #141414; padding: 12px; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;">
+          <div style="color: #fff; font-weight: bold; margin-bottom: 8px;">${title}</div>
+          ${data.map(item => `<div style="color: #e50914; font-weight: 900;">${item.name}: ${item.value}</div>`).join('')}
+        </div>`;
+      }
     },
   };
 
@@ -63,155 +69,166 @@ export default function StatisticsPage() {
       key: 'index',
       width: 50,
       align: 'center' as const,
-      render: (_: unknown, __: unknown, index: number) => index + 1,
+      render: (_: unknown, __: unknown, index: number) => <span className="text-gray-500 font-bold">{index + 1}</span>,
     },
     {
       title: 'Sinh viên',
       key: 'student',
       render: (_: unknown, r: BorrowResponse) => (
         <div>
-          <div style={{ fontWeight: 600 }}>{r.userName}</div>
-          <div style={{ fontSize: 12, color: '#6b7280' }}>{r.userEmail}</div>
+          <div className="font-bold text-gray-200">{r.userName}</div>
+          <div className="text-[10px] text-gray-500 font-mono mt-0.5">{r.userEmail}</div>
         </div>
       ),
     },
-    { title: 'Thiết bị', dataIndex: 'equipmentName' },
-    { title: 'SL', dataIndex: 'quantity', align: 'center' as const },
+    { title: 'Thiết bị', dataIndex: 'equipmentName', render: (n: string) => <span className="text-gray-300 font-bold">{n}</span> },
+    { title: 'SL', dataIndex: 'quantity', align: 'center' as const, render: (v: number) => <span className="text-white font-black">{v}</span> },
     {
       title: 'Hạn trả',
       dataIndex: 'returnDate',
-      render: (d: string) => (
-        <span style={{ color: '#ef4444', fontWeight: 700 }}>
-          {dayjs(d).format('DD/MM/YYYY')}
-          {' '}({dayjs().diff(dayjs(d), 'day')} ngày)
-        </span>
-      ),
-    },
-    {
-      title: 'Trạng thái',
-      dataIndex: 'status',
-      render: (s: string) => (
-        <Tag color="volcano" style={{ fontWeight: 600 }}>
-          {BORROW_STATUS_LABELS[s as keyof typeof BORROW_STATUS_LABELS]}
-        </Tag>
-      ),
+      render: (d: string) => {
+        const days = dayjs().diff(dayjs(d), 'day');
+        return (
+          <div>
+            <div className="text-red-400 font-bold">{dayjs(d).format('DD/MM/YYYY')}</div>
+            <div className="text-[10px] bg-red-500/20 text-red-400 border border-red-500/30 px-2 py-0.5 rounded uppercase font-black inline-block mt-1">
+              Trễ {days} ngày
+            </div>
+          </div>
+        );
+      },
     },
   ];
 
   return (
-    <div className="page-content">
-      <div className="page-header">
-        <h1>📊 Thống Kê & Báo Cáo</h1>
-        <p>Xem thống kê thiết bị mượn nhiều và danh sách quá hạn</p>
+    <div className="max-w-7xl mx-auto space-y-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-white/10 pb-6 mb-6 gap-4">
+        <div>
+          <h2 className="text-2xl font-black tracking-wide text-white flex items-center gap-3">
+            <i className="fa-solid fa-chart-line text-[#e50914]"></i> THỐNG KÊ & BÁO CÁO
+          </h2>
+          <p className="text-xs text-gray-500 mt-1 uppercase font-bold tracking-wider">Số liệu chi tiết về hoạt động mượn trả.</p>
+        </div>
       </div>
 
-      {/* Overdue Alert */}
       {overdueList.length > 0 && (
         <Alert
-          message={`🚨 Có ${overdueList.length} thiết bị đang quá hạn trả!`}
+          message={<span className="font-black text-red-400"><i className="fa-solid fa-triangle-exclamation mr-2"></i> Có {overdueList.length} thiết bị đang quá hạn trả!</span>}
           type="error"
-          showIcon
-          style={{ marginBottom: 24, borderRadius: 12 }}
+          className="bg-red-500/10 border border-red-500/20 mb-6"
         />
       )}
 
-      {/* Monthly Statistics Chart */}
-      <Card
-        title={
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
-            <span style={{ fontWeight: 700 }}>📈 Thiết bị mượn nhiều nhất</span>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <Select
-                value={month}
-                onChange={setMonth}
-                options={months}
-                style={{ width: 120 }}
-              />
-              <Select
-                value={year}
-                onChange={setYear}
-                options={years}
-                style={{ width: 120 }}
-              />
-            </div>
+      <div className="bg-[#121212] border border-white/5 rounded-2xl overflow-hidden shadow-2xl p-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+          <h3 className="text-white font-black uppercase tracking-wider text-sm flex items-center gap-2">
+            <i className="fa-solid fa-chart-column text-indigo-400"></i> BIỂU ĐỒ MƯỢN NHIỀU NHẤT
+          </h3>
+          <div className="flex gap-2 bg-white/5 p-1 rounded-lg border border-white/10">
+            <Select
+              value={month}
+              onChange={setMonth}
+              options={months}
+              className="w-28 dark-select"
+              dropdownStyle={{ background: '#141414', border: '1px solid rgba(255,255,255,0.1)' }}
+            />
+            <Select
+              value={year}
+              onChange={setYear}
+              options={years}
+              className="w-28 dark-select"
+              dropdownStyle={{ background: '#141414', border: '1px solid rgba(255,255,255,0.1)' }}
+            />
           </div>
-        }
-        style={{ borderRadius: 16, marginBottom: 24 }}
-      >
+        </div>
+
         {isLoading ? (
-          <div style={{ textAlign: 'center', padding: 60 }}><Spin size="large" /></div>
+          <div className="text-center py-20"><Spin size="large" /></div>
         ) : chartData.length === 0 ? (
-          <Empty description={`Không có dữ liệu tháng ${month}/${year}`} style={{ padding: 40 }} />
+          <div className="text-center py-16">
+            <Empty description={<span className="text-gray-500 font-bold uppercase tracking-wider text-xs">Không có dữ liệu tháng {month}/{year}</span>} />
+          </div>
         ) : (
-          <Column {...chartConfig} height={300} />
+          <div style={{ height: 350 }}>
+            <Column {...chartConfig} />
+          </div>
         )}
-      </Card>
+      </div>
 
-      {/* Monthly Stats Table */}
-      {stats.length > 0 && (
-        <Card
-          title={`📋 Chi tiết - Tháng ${month}/${year}`}
-          style={{ borderRadius: 16, marginBottom: 24 }}
-        >
-          <Table
-            dataSource={stats}
-            rowKey="equipmentId"
-            pagination={false}
-            size="small"
-            columns={[
-              {
-                title: 'Hạng',
-                key: 'rank',
-                width: 60,
-                align: 'center',
-                render: (_: unknown, __: unknown, index: number) => (
-                  <div style={{
-                    width: 28, height: 28, borderRadius: '50%', margin: '0 auto',
-                    background: index === 0 ? '#fbbf24' : index === 1 ? '#9ca3af' : index === 2 ? '#f97316' : '#e5e7eb',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontWeight: 700, fontSize: 12, color: index < 3 ? '#fff' : '#374151',
-                  }}>
-                    {index + 1}
-                  </div>
-                ),
-              },
-              { title: 'Tên thiết bị', dataIndex: 'equipmentName', key: 'equipmentName', render: (n: string) => <strong>{n}</strong> },
-              {
-                title: 'Số lượng mượn',
-                dataIndex: 'borrowCount',
-                key: 'borrowCount',
-                align: 'center',
-                render: (v: number) => <Tag color="purple" style={{ fontWeight: 700, fontSize: 14 }}>{v}</Tag>,
-              },
-            ]}
-          />
-        </Card>
-      )}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="bg-[#121212] border border-white/5 rounded-2xl overflow-hidden shadow-2xl p-6">
+          <h3 className="text-white font-black uppercase tracking-wider text-sm mb-6 flex items-center gap-2">
+             <i className="fa-solid fa-list-ol text-emerald-400"></i> CHI TIẾT THÁNG {month}/{year}
+          </h3>
+          {stats.length > 0 ? (
+            <Table
+              dataSource={stats}
+              rowKey="equipmentId"
+              pagination={{ pageSize: 5 }}
+              size="small"
+              className="dark-theme-table"
+              columns={[
+                {
+                  title: 'Hạng',
+                  key: 'rank',
+                  width: 60,
+                  align: 'center',
+                  render: (_: unknown, __: unknown, index: number) => (
+                    <div className={`w-6 h-6 rounded-full mx-auto flex items-center justify-center font-black text-[10px] ${index === 0 ? 'bg-amber-400 text-black' : index === 1 ? 'bg-gray-400 text-black' : index === 2 ? 'bg-orange-600 text-white' : 'bg-white/10 text-gray-400'}`}>
+                      {index + 1}
+                    </div>
+                  ),
+                },
+                { title: 'Tên thiết bị', dataIndex: 'equipmentName', key: 'equipmentName', render: (n: string) => <span className="font-bold text-gray-200">{n}</span> },
+                {
+                  title: 'Số lượng mượn',
+                  dataIndex: 'borrowCount',
+                  key: 'borrowCount',
+                  align: 'center',
+                  render: (v: number) => <span className="bg-[#e50914]/20 text-[#e50914] border border-[#e50914]/30 px-2 py-0.5 rounded font-black text-xs">{v}</span>,
+                },
+              ]}
+            />
+          ) : (
+            <div className="text-center py-10 text-gray-500 text-xs font-bold uppercase tracking-wider">Chưa có lượt mượn</div>
+          )}
+        </div>
 
-      {/* Overdue List */}
-      <Card
-        title={
-          <span style={{ color: overdueList.length > 0 ? '#ef4444' : undefined }}>
-            🚨 Danh sách thiết bị quá hạn {overdueList.length > 0 ? `(${overdueList.length})` : ''}
-          </span>
+        <div className="bg-[#121212] border border-t-4 border-white/5 border-t-red-500 rounded-2xl overflow-hidden shadow-2xl p-6">
+          <h3 className="text-red-400 font-black uppercase tracking-wider text-sm mb-6 flex items-center gap-2">
+             <i className="fa-solid fa-skull-crossbones"></i> DANH SÁCH QUÁ HẠN {overdueList.length > 0 && `(${overdueList.length})`}
+          </h3>
+          
+          {overdueLoading ? (
+            <div className="text-center py-10"><Spin /></div>
+          ) : overdueList.length === 0 ? (
+            <div className="text-center py-10 text-emerald-500 text-xs font-bold uppercase tracking-wider">
+               <i className="fa-solid fa-check-circle text-3xl mb-2 block"></i> Không có thiết bị nào quá hạn!
+            </div>
+          ) : (
+            <Table
+              columns={overdueColumns}
+              dataSource={overdueList}
+              rowKey="id"
+              pagination={{ pageSize: 5 }}
+              size="small"
+              className="dark-theme-table border-red-500"
+            />
+          )}
+        </div>
+      </div>
+
+      <style>{`
+        .dark-select .ant-select-selector {
+          background-color: transparent !important;
+          border: none !important;
+          color: #fff !important;
+          font-weight: bold;
         }
-        style={{ borderRadius: 16 }}
-      >
-        {overdueLoading ? (
-          <div style={{ textAlign: 'center', padding: 40 }}><Spin /></div>
-        ) : overdueList.length === 0 ? (
-          <Empty description="✅ Không có thiết bị nào quá hạn!" image={Empty.PRESENTED_IMAGE_SIMPLE} />
-        ) : (
-          <Table
-            columns={overdueColumns}
-            dataSource={overdueList}
-            rowKey="id"
-            pagination={{ pageSize: 5 }}
-            size="small"
-            rowClassName={() => 'overdue-row'}
-          />
-        )}
-      </Card>
+        .dark-select .ant-select-arrow {
+          color: #9ca3af;
+        }
+      `}</style>
     </div>
   );
 }

@@ -1,32 +1,10 @@
-import { Layout, Menu, Avatar, Dropdown, Badge, Button } from 'antd';
+import { useState, useEffect } from 'react';
+import { Dropdown } from 'antd';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  AppstoreOutlined,
-  FormOutlined,
-  HistoryOutlined,
-  BellOutlined,
-  LogoutOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
 import { logout } from '@/store/slices/authSlice';
 import { RootState } from '@/store';
 import { useGetUnreadCountQuery } from '@/store/api/notificationApi';
-import NotificationBell from '@/components/NotificationBell';
-
-const { Sider, Content, Header } = Layout;
-
-const menuItems = [
-  { key: '/student/equipment', icon: <AppstoreOutlined />, label: 'Danh sách thiết bị' },
-  { key: '/student/borrow', icon: <FormOutlined />, label: 'Gửi yêu cầu mượn' },
-  { key: '/student/history', icon: <HistoryOutlined />, label: 'Lịch sử mượn' },
-];
-
-const pageTitles: Record<string, string> = {
-  '/student/equipment': 'Danh Sách Thiết Bị',
-  '/student/borrow': 'Gửi Yêu Cầu Mượn',
-  '/student/history': 'Lịch Sử Mượn',
-};
 
 export default function StudentLayout() {
   const navigate = useNavigate();
@@ -44,71 +22,84 @@ export default function StudentLayout() {
     items: [
       {
         key: 'info',
-        icon: <UserOutlined />,
         label: (
-          <div>
-            <div style={{ fontWeight: 600 }}>{user?.name}</div>
-            <div style={{ fontSize: 12, color: '#6b7280' }}>{user?.studentId}</div>
+          <div className="py-1">
+            <div className="font-bold text-white">{user?.name}</div>
+            <div className="text-xs text-gray-400">{user?.studentId}</div>
           </div>
         ),
       },
-      { type: 'divider' as const },
-      { key: 'logout', icon: <LogoutOutlined />, label: 'Đăng xuất', danger: true },
+      { type: 'divider' as const, style: { borderColor: 'rgba(255,255,255,0.1)' } },
+      { key: 'logout', label: <span className="text-red-500 font-bold">Đăng xuất</span>, onClick: handleLogout },
     ],
-    onClick: ({ key }: { key: string }) => key === 'logout' && handleLogout(),
   };
 
+  const navLinks = [
+    { path: '/student/equipment', label: 'Trang chủ' },
+    { path: '/student/borrow', label: 'Mượn thiết bị' },
+    { path: '/student/history', label: 'Lịch sử mượn' },
+  ];
+
   return (
-    <Layout className="app-layout">
-      <Sider width={240} className="app-sider" theme="dark" breakpoint="lg" collapsedWidth={0}>
-        <div className="sider-logo">
-          <div className="sider-logo-icon">
-            <img
-              src="https://tse3.mm.bing.net/th/id/OIP.RjZcMPjW1gO4lp8xOM66IgHaHa?cb=thfvnextfalcon&rs=1&pid=ImgDetMain&o=7&rm=3"
-              alt="Logo"
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'contain',
-                borderRadius: '50%',
-              }}
-            />
+    <div className="min-h-screen flex flex-col pb-20">
+      {/* Premium Navbar (Glassmorphism) */}
+      <nav className="bg-[#0c0c0c]/80 backdrop-blur-xl px-6 md:px-12 py-4 flex justify-between items-center sticky top-0 z-40 border-b border-white/5">
+        <div className="flex items-center gap-10">
+          <div 
+            onClick={() => navigate('/student/equipment')}
+            className="text-[#e50914] text-3xl font-black tracking-tighter cursor-pointer" 
+            style={{ textShadow: '0 2px 10px rgba(229,9,20,0.3)' }}
+          >
+            GEARFLIX
           </div>
-          <div className="sider-logo-text">
-            <h2>CLB Borrow</h2>
-            <p>Sinh viên</p>
+          <div className="hidden lg:flex gap-6 text-xs font-semibold tracking-wider text-gray-400 uppercase">
+            {navLinks.map((link) => (
+              <a 
+                key={link.path}
+                onClick={(e) => { e.preventDefault(); navigate(link.path); }}
+                href={link.path}
+                className={`transition ${location.pathname === link.path ? 'text-white border-b-2 border-[#e50914] pb-1' : 'hover:text-white'}`}
+              >
+                {link.label}
+              </a>
+            ))}
           </div>
         </div>
-        <Menu
-          theme="dark"
-          mode="inline"
-          selectedKeys={[location.pathname]}
-          items={menuItems}
-          onClick={({ key }) => navigate(key)}
-          style={{ background: 'transparent', border: 'none', marginTop: 8 }}
-        />
-      </Sider>
 
-      <Layout className="app-main-layout">
-        <Header className="app-header" style={{ height: 64 }}>
-          <h2 className="header-title">{pageTitles[location.pathname] || 'CLB Borrow'}</h2>
-          <div className="header-right">
-            <NotificationBell unreadCount={unreadData?.data?.count || 0} />
-            <Dropdown menu={userMenu} placement="bottomRight" arrow>
-              <div className="user-info">
-                <Avatar style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)' }}>
-                  {user?.name?.charAt(0)}
-                </Avatar>
-                <span style={{ fontWeight: 600, fontSize: 14 }}>{user?.name}</span>
+        <div className="flex items-center gap-6">
+          {/* Notification Icon */}
+          <div className="relative text-gray-400 hover:text-white cursor-pointer transition">
+            <i className="fa-solid fa-bell text-lg"></i>
+            {unreadData?.data?.count ? (
+              <span className="absolute -top-1.5 -right-1.5 bg-[#e50914] text-white text-[9px] font-bold px-1.5 rounded-full">
+                {unreadData.data.count}
+              </span>
+            ) : null}
+          </div>
+
+          <div className="flex items-center gap-2 border-l border-white/10 pl-4">
+            <Dropdown menu={userMenu} placement="bottomRight" trigger={['click']} dropdownRender={(menu) => (
+              <div className="bg-[#141414] border border-white/10 rounded-lg shadow-xl min-w-[150px]">
+                {menu}
+              </div>
+            )}>
+              <div className="flex items-center gap-2 cursor-pointer group">
+                <div className="w-8 h-8 rounded bg-gradient-to-tr from-purple-600 to-indigo-600 text-white font-bold flex items-center justify-center text-xs shadow group-hover:scale-105 transition">
+                  {user?.name?.charAt(0) || 'U'}
+                </div>
+                <span className="hidden sm:inline text-xs font-bold text-gray-300 group-hover:text-white transition">
+                  {user?.name || 'Student'}
+                </span>
               </div>
             </Dropdown>
           </div>
-        </Header>
+        </div>
+      </nav>
 
-        <Content className="app-content">
-          <Outlet />
-        </Content>
-      </Layout>
-    </Layout>
+      {/* Main Content Area */}
+      <div className="flex-1">
+        <Outlet />
+      </div>
+    </div>
   );
 }

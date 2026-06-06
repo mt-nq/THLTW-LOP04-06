@@ -72,6 +72,10 @@ public class EquipmentService {
     }
 
     public EquipmentResponse create(EquipmentRequest request) {
+        if (equipmentRepository.existsByNameIgnoreCase(request.getName())) {
+            throw new RuntimeException("Tên thiết bị đã tồn tại");
+        }
+
         Equipment equipment = Equipment.builder()
                 .name(request.getName())
                 .description(request.getDescription())
@@ -86,6 +90,11 @@ public class EquipmentService {
     public EquipmentResponse update(Long id, EquipmentRequest request) {
         Equipment equipment = equipmentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Thiết bị không tồn tại với id: " + id));
+
+        if (equipmentRepository.existsByNameIgnoreCaseAndIdNot(request.getName(), id)) {
+            throw new RuntimeException("Tên thiết bị đã tồn tại");
+        }
+
         equipment.setName(request.getName());
         equipment.setDescription(request.getDescription());
         equipment.setTotalQuantity(request.getTotalQuantity());

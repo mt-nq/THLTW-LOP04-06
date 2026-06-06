@@ -68,6 +68,7 @@ export interface BorrowResponse {
   status: BorrowStatus;
   note?: string;
   adminNote?: string;
+  extended?: boolean;
   createdAt: string;
 }
 

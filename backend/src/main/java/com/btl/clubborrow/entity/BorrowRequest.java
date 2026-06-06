@@ -50,6 +50,9 @@ public class BorrowRequest {
     @Column(name = "admin_note", columnDefinition = "TEXT")
     private String adminNote;
 
+    @Builder.Default
+    private Boolean extended = false;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

@@ -27,6 +27,10 @@ export const borrowApi = baseApi.injectEndpoints({
       query: (id) => ({ url: `/api/borrows/${id}/return`, method: 'PUT' }),
       invalidatesTags: ['Borrow', 'Equipment', 'Statistics'],
     }),
+    extendBorrow: builder.mutation<ApiResponse<BorrowResponse>, { id: number; newReturnDate: string }>({
+      query: ({ id, newReturnDate }) => ({ url: `/api/borrows/${id}/extend`, method: 'PUT', body: { newReturnDate } }),
+      invalidatesTags: ['Borrow'],
+    }),
   }),
 });
 
@@ -37,4 +41,5 @@ export const {
   useApproveBorrowMutation,
   useRejectBorrowMutation,
   useReturnBorrowMutation,
+  useExtendBorrowMutation,
 } = borrowApi;

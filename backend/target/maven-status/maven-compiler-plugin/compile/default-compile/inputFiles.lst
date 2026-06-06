@@ -28,6 +28,7 @@ C:\Users\admin\2.2\BTL\backend\src\main\java\com\btl\clubborrow\dto\response\Das
 C:\Users\admin\2.2\BTL\backend\src\main\java\com\btl\clubborrow\entity\BorrowStatus.java
 C:\Users\admin\2.2\BTL\backend\src\main\java\com\btl\clubborrow\ClubBorrowApplication.java
 C:\Users\admin\2.2\BTL\backend\src\main\java\com\btl\clubborrow\dto\response\ApiResponse.java
+C:\Users\admin\2.2\BTL\backend\src\main\java\com\btl\clubborrow\dto\request\ExtendRequest.java
 C:\Users\admin\2.2\BTL\backend\src\main\java\com\btl\clubborrow\service\AuthService.java
 C:\Users\admin\2.2\BTL\backend\src\main\java\com\btl\clubborrow\service\StatisticsService.java
 C:\Users\admin\2.2\BTL\backend\src\main\java\com\btl\clubborrow\controller\EquipmentController.java

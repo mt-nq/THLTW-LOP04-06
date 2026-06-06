@@ -1,6 +1,7 @@
 package com.btl.clubborrow.service;
 
 import com.btl.clubborrow.dto.request.BorrowCreateRequest;
+import com.btl.clubborrow.dto.request.ExtendRequest;
 import com.btl.clubborrow.dto.request.RejectRequest;
 import com.btl.clubborrow.dto.request.ApproveRequest;
 import com.btl.clubborrow.dto.response.BorrowResponse;
@@ -167,6 +168,51 @@ public class BorrowService {
         return toResponse(borrow);
     }
 
+    // ===== Sinh viên: Gia hạn mượn =====
+    @Transactional
+    public BorrowResponse extendBorrow(Long id, ExtendRequest request, Long userId) {
+        BorrowRequest borrow = getBorrowOrThrow(id);
+
+        if (!borrow.getUser().getId().equals(userId)) {
+            throw new RuntimeException("Bạn không có quyền gia hạn yêu cầu này");
+        }
+
+        if (borrow.getStatus() != BorrowStatus.APPROVED) {
+            throw new RuntimeException("Chỉ có thể gia hạn yêu cầu đang mượn");
+        }
+
+        if (Boolean.TRUE.equals(borrow.getExtended())) {
+            throw new RuntimeException("Mỗi phiếu mượn chỉ được gia hạn 1 lần");
+        }
+
+        long daysUntilReturn = java.time.temporal.ChronoUnit.DAYS.between(LocalDate.now(), borrow.getReturnDate());
+        if (daysUntilReturn > 2) {
+            throw new RuntimeException("Chỉ có thể gia hạn khi còn tối đa 2 ngày trước hạn trả");
+        }
+
+        if (!request.getNewReturnDate().isAfter(borrow.getReturnDate())) {
+            throw new RuntimeException("Ngày trả mới phải sau ngày trả hiện tại (" + borrow.getReturnDate().format(DATE_FMT) + ")");
+        }
+
+        long extendDays = java.time.temporal.ChronoUnit.DAYS.between(borrow.getReturnDate(), request.getNewReturnDate());
+        if (extendDays > 7) {
+            throw new RuntimeException("Chỉ được gia hạn tối đa 7 ngày");
+        }
+
+        borrow.setReturnDate(request.getNewReturnDate());
+        borrow.setExtended(true);
+        borrowRequestRepository.save(borrow);
+
+        notificationService.createNotification(
+            borrow.getUser().getId(),
+            "📅 Gia hạn mượn thành công",
+            "Phiếu mượn " + borrow.getEquipment().getName() + " đã được gia hạn đến " + request.getNewReturnDate().format(DATE_FMT),
+            NotificationType.APPROVED
+        );
+
+        return toResponse(borrow);
+    }
+
     private BorrowRequest getBorrowOrThrow(Long id) {
         return borrowRequestRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Yêu cầu mượn không tồn tại với id: " + id));
@@ -189,6 +235,7 @@ public class BorrowService {
                 .status(b.getStatus())
                 .note(b.getNote())
                 .adminNote(b.getAdminNote())
+                .extended(Boolean.TRUE.equals(b.getExtended()))
                 .createdAt(b.getCreatedAt())
                 .build();
     }

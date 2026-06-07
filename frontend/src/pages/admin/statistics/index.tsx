@@ -30,6 +30,8 @@ const getEquipmentIcon = (name: string) => {
 export default function StatisticsPage() {
   const [month, setMonth] = useState(currentMonth);
   const [year, setYear] = useState(currentYear);
+  const [rankPage, setRankPage] = useState(1);
+  const [overduePage, setOverduePage] = useState(1);
 
   const { data: statsData, isLoading } = useGetMonthlyStatsQuery({ month, year });
   const { data: overdueData, isLoading: overdueLoading } = useGetOverdueQuery();
@@ -57,7 +59,10 @@ export default function StatisticsPage() {
       key: 'index',
       width: 50,
       align: 'center' as const,
-      render: (_: unknown, __: unknown, index: number) => <span className="text-gray-500 font-bold">{index + 1}</span>,
+      render: (_: unknown, __: unknown, index: number) => {
+        const actualIndex = (overduePage - 1) * 5 + index + 1;
+        return <span className="text-gray-500 font-bold">{actualIndex}</span>;
+      },
     },
     {
       title: 'Sinh viên',
@@ -195,7 +200,7 @@ export default function StatisticsPage() {
             <Table
               dataSource={stats}
               rowKey="equipmentId"
-              pagination={{ pageSize: 5, hideOnSinglePage: true }}
+              pagination={{ pageSize: 5, hideOnSinglePage: true, current: rankPage, onChange: setRankPage }}
               size="small"
               className="dark-theme-table"
               columns={[
@@ -204,11 +209,14 @@ export default function StatisticsPage() {
                   key: 'rank',
                   width: 60,
                   align: 'center',
-                  render: (_: unknown, __: unknown, index: number) => (
-                    <div className={`w-6 h-6 rounded-full mx-auto flex items-center justify-center font-black text-[10px] ${index === 0 ? 'bg-amber-400 text-black' : index === 1 ? 'bg-gray-400 text-black' : index === 2 ? 'bg-orange-600 text-white' : 'bg-white/10 text-gray-400'}`}>
-                      {index + 1}
-                    </div>
-                  ),
+                  render: (_: unknown, __: unknown, index: number) => {
+                    const actualIndex = (rankPage - 1) * 5 + index;
+                    return (
+                      <div className={`w-6 h-6 rounded-full mx-auto flex items-center justify-center font-black text-[10px] ${actualIndex === 0 ? 'bg-amber-400 text-black' : actualIndex === 1 ? 'bg-gray-400 text-black' : actualIndex === 2 ? 'bg-orange-600 text-white' : 'bg-white/10 text-gray-400'}`}>
+                        {actualIndex + 1}
+                      </div>
+                    );
+                  },
                 },
                 { title: 'Tên thiết bị', dataIndex: 'equipmentName', key: 'equipmentName', render: (n: string) => <span className="font-bold text-gray-200">{n}</span> },
                 {
@@ -241,7 +249,7 @@ export default function StatisticsPage() {
               columns={overdueColumns}
               dataSource={overdueList}
               rowKey="id"
-              pagination={{ pageSize: 5, hideOnSinglePage: true }}
+              pagination={{ pageSize: 5, hideOnSinglePage: true, current: overduePage, onChange: setOverduePage }}
               size="small"
               className="dark-theme-table border-red-500"
             />

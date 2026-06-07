@@ -11,7 +11,7 @@ const STATUS_STYLE: Record<BorrowStatus, { bg: string; border: string; color: st
   RETURNED: { bg: 'rgba(16,185,129,0.1)', border: 'rgba(16,185,129,0.25)', color: '#34d399', dot: '#10b981' },
   OVERDUE:  { bg: 'rgba(239,68,68,0.1)',  border: 'rgba(239,68,68,0.25)',  color: '#f87171', dot: '#ef4444' },
   REJECTED: { bg: 'rgba(255,255,255,0.05)', border: 'rgba(255,255,255,0.1)', color: '#6b7280', dot: '#4b5563' },
-  CANCELED: { bg: 'rgba(255,255,255,0.05)', border: 'rgba(255,255,255,0.1)', color: '#9ca3af', dot: '#6b7280' },
+  CANCELED: { bg: 'rgba(255,255,255,0.08)', border: 'rgba(255,255,255,0.2)', color: '#d1d5db', dot: '#9ca3af' },
 };
 
 export default function HistoryPage() {
@@ -78,7 +78,7 @@ export default function HistoryPage() {
   const stats = [
     { label: 'Tổng Phiếu',  value: allBorrows.length,                                      color: '#e5e7eb', accent: '#e50914' },
     { label: 'Chờ Duyệt',   value: allBorrows.filter(b => b.status === 'PENDING').length,  color: '#fbbf24', accent: '#f59e0b' },
-    { label: 'Đang Mượn',   value: allBorrows.filter(b => b.status === 'APPROVED').length, color: '#60a5fa', accent: '#3b82f6' },
+    { label: 'Đã Duyệt',   value: allBorrows.filter(b => b.status === 'APPROVED').length, color: '#60a5fa', accent: '#3b82f6' },
     { label: 'Đã Trả',      value: allBorrows.filter(b => b.status === 'RETURNED').length, color: '#34d399', accent: '#10b981' },
     { label: 'Quá Hạn',     value: allBorrows.filter(b => b.status === 'OVERDUE').length,  color: '#f87171', accent: '#ef4444' },
     { label: 'Bị Từ Chối',  value: allBorrows.filter(b => b.status === 'REJECTED' && b.adminNote !== 'Sinh viên tự hủy').length, color: '#6b7280', accent: '#4b5563' },
@@ -87,7 +87,7 @@ export default function HistoryPage() {
 
   const columns = [
     {
-      title: '#', key: 'index', width: 48, align: 'center' as const,
+      title: 'STT', key: 'index', width: 48, align: 'center' as const,
       render: (_: unknown, __: unknown, i: number) => (
         <span style={{ fontSize: 12, color: '#4b5563', fontWeight: 700 }}>{i + 1}</span>
       ),
@@ -149,7 +149,7 @@ export default function HistoryPage() {
       },
     },
     {
-      title: 'Thao tác', key: 'action', align: 'right' as const,
+      title: 'Thao tác', key: 'action', align: 'left' as const,
       render: (_: unknown, record: BorrowResponse) => {
         // daysToReturn có thể tính khoảng cách ngày.
         // Dùng endOf('day') để ngày trả hôm nay diff với bây giờ là 0.
@@ -157,10 +157,11 @@ export default function HistoryPage() {
         const canExtend = record.status === 'APPROVED' && !record.isExtended && daysToReturn <= 3 && daysToReturn >= 0;
 
         return (
-          <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+          <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-start' }}>
             {canExtend && (
               <Button 
                 size="small" 
+                className="action-btn-extend"
                 onClick={() => {
                   setExtendRecord(record);
                   setExtendToDate(dayjs(record.returnDate).add(7, 'day'));
@@ -189,6 +190,7 @@ export default function HistoryPage() {
               <Button
                 size="small"
                 danger
+                className="action-btn-cancel"
                 onClick={() => {
                   setCancelRecord(record);
                   setCancelModalVisible(true);
@@ -214,6 +216,7 @@ export default function HistoryPage() {
             {record.status === 'OVERDUE' && (
               <Button
                 size="small"
+                className="action-btn-contact"
                 onClick={() => setContactModalVisible(true)}
                 style={{
                   fontSize: 11,
@@ -243,11 +246,7 @@ export default function HistoryPage() {
     },
   ];
 
-  if (isLoading) return (
-    <div style={{ height: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <Spin size="large" />
-    </div>
-  );
+  // Removed global loading to show skeleton inside Table instead
 
   return (
     <div style={{ minHeight: '100vh', background: '#141414', color: '#e5e7eb', padding: '40px 4%' }}>
@@ -266,9 +265,11 @@ export default function HistoryPage() {
               Theo dõi tiến trình và trạng thái các yêu cầu mượn thiết bị.
             </p>
           </div>
-          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             <Input
               placeholder="Tìm thiết bị..."
+              size="large"
+              className="dark-filter-input"
               prefix={<i className="fa-solid fa-magnifying-glass" style={{ color: '#6b7280', fontSize: 13 }} />}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
@@ -277,6 +278,8 @@ export default function HistoryPage() {
             />
             <DatePicker.RangePicker
               format="DD/MM/YYYY"
+              size="large"
+              className="dark-filter-input"
               value={dateRange}
               onChange={(dates) => setDateRange(dates)}
               style={{ width: 260, background: '#1a1a1a', borderColor: 'rgba(255,255,255,0.08)', color: '#fff' }}
@@ -285,12 +288,15 @@ export default function HistoryPage() {
             />
             <Select
               value={statusFilter}
+              size="large"
+              className="dark-filter-input"
               onChange={setStatusFilter}
               style={{ width: 170 }}
               options={[
                 { value: 'ALL', label: 'Tất cả trạng thái' },
                 ...Object.entries(BORROW_STATUS_LABELS).map(([value, label]) => ({ value, label })),
               ]}
+              popupClassName="dark-dropdown"
             />
           </div>
         </div>
@@ -320,22 +326,30 @@ export default function HistoryPage() {
           border: '1px solid rgba(255,255,255,0.06)',
           overflow: 'hidden',
         }}>
-          {filtered.length === 0 ? (
-            <div style={{ padding: '60px 16px', textAlign: 'center' }}>
-              <Empty description={<span style={{ color: '#4b5563', fontSize: 13, fontWeight: 600 }}>Không tìm thấy yêu cầu mượn nào</span>} image={Empty.PRESENTED_IMAGE_SIMPLE} />
-            </div>
-          ) : (
-            <Table
-              columns={columns}
-              dataSource={filtered}
-              rowKey="id"
-              scroll={{ x: 700 }}
-              pagination={{
-                pageSize: 10,
-                style: { padding: '12px 20px' },
-              }}
-            />
-          )}
+          <Table
+            loading={{
+              spinning: isLoading,
+              indicator: <Spin size="large" />,
+            }}
+            columns={columns}
+            dataSource={filtered}
+            rowKey="id"
+            scroll={{ x: 700 }}
+            pagination={{
+              pageSize: 10,
+              style: { padding: '12px 20px' },
+            }}
+            locale={{
+              emptyText: (
+                <div style={{ padding: '40px 0' }}>
+                  <Empty 
+                    image={Empty.PRESENTED_IMAGE_SIMPLE} 
+                    description={<span style={{ color: '#6b7280', fontSize: 14 }}>Không có dữ liệu phù hợp với bộ lọc</span>} 
+                  />
+                </div>
+              )
+            }}
+          />
         </div>
       </div>
 
@@ -538,6 +552,60 @@ export default function HistoryPage() {
           </div>
         </div>
       </Modal>
+
+      <style>{`
+        .action-btn-extend { transition: all 0.2s; }
+        .action-btn-extend:hover { background: rgba(59,130,246,0.25) !important; color: #93c5fd !important; border-color: rgba(59,130,246,0.5) !important; }
+        
+        .action-btn-cancel { transition: all 0.2s; }
+        .action-btn-cancel:hover { background: rgba(239,68,68,0.1) !important; color: #fca5a5 !important; border-color: rgba(239,68,68,0.8) !important; }
+        
+        .action-btn-contact { transition: all 0.2s; }
+        .action-btn-contact:hover { background: rgba(245,158,11,0.2) !important; color: #fcd34d !important; border-color: rgba(245,158,11,0.5) !important; }
+        
+        /* Dark Filter Inputs Fix */
+        .dark-filter-input .ant-input,
+        .dark-filter-input input {
+          background-color: transparent !important;
+          color: #fff !important;
+          border: none !important;
+          box-shadow: none !important;
+          outline: none !important;
+        }
+        .dark-filter-input .ant-input::placeholder,
+        .dark-filter-input input::placeholder {
+          color: #6b7280 !important;
+        }
+        .dark-filter-input.ant-select .ant-select-selector {
+          background-color: #1a1a1a !important;
+          border-color: rgba(255,255,255,0.08) !important;
+        }
+        .dark-filter-input .ant-select-selection-item {
+          color: #fff !important;
+        }
+        .dark-filter-input .ant-select-arrow,
+        .dark-filter-input .ant-picker-suffix,
+        .dark-filter-input .ant-picker-separator {
+          color: #6b7280 !important;
+        }
+        .dark-filter-input .ant-input-clear-icon,
+        .dark-filter-input .ant-picker-clear {
+          color: #6b7280 !important;
+          background: transparent !important;
+        }
+        
+        /* Dropdown style */
+        .dark-dropdown .ant-select-item {
+          color: #d1d5db;
+        }
+        .dark-dropdown .ant-select-item-option-selected {
+          background-color: rgba(91,92,240,0.2) !important;
+          color: #818cf8 !important;
+        }
+        .dark-dropdown .ant-select-item-option-active {
+          background-color: rgba(255,255,255,0.08) !important;
+        }
+      `}</style>
     </div>
   );
 }

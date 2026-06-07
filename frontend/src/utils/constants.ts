@@ -5,9 +5,9 @@ export const USER_KEY = 'club_borrow_user';
 export const BORROW_STATUS_LABELS: Record<string, string> = {
   PENDING: 'Chờ duyệt',
   APPROVED: 'Đã duyệt',
-  REJECTED: 'Từ chối',
   RETURNED: 'Đã trả',
   OVERDUE: 'Quá hạn',
+  REJECTED: 'Bị từ chối',
   CANCELED: 'Đã hủy',
 };
 

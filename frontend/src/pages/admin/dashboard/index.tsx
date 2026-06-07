@@ -21,19 +21,19 @@ export default function AdminDashboard() {
       color: 'indigo',
     },
     {
-      title: 'ĐANG MƯỢN',
+      title: 'THIẾT BỊ ĐANG MƯỢN',
       value: stats?.totalBorrowing || 0,
       icon: 'fa-hand-holding-hand',
       color: 'blue',
     },
     {
-      title: 'CHỜ PHÊ DUYỆT',
+      title: 'THIẾT BỊ CHỜ MƯỢN',
       value: stats?.totalPending || 0,
       icon: 'fa-hourglass-half',
       color: 'amber',
     },
     {
-      title: 'QUÁ HẠN',
+      title: 'THIẾT BỊ QUÁ HẠN',
       value: stats?.totalOverdue || 0,
       icon: 'fa-triangle-exclamation',
       color: 'red',

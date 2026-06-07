@@ -66,6 +66,17 @@ export default function StudentEquipmentPage() {
         </div>
         <style>{`
           @keyframes fadeIn { from { opacity: 0.4; } to { opacity: 1; } }
+          .hero-cta-btn { transition: all 0.3s ease !important; }
+          .hero-cta-btn:hover { filter: brightness(1.15); box-shadow: 0 4px 20px rgba(59,130,246,0.4) !important; }
+          .hero-cta-btn i { transition: transform 0.3s ease; }
+          .hero-cta-btn:hover i { transform: translateX(4px); }
+
+          .equipment-card { transition: all 0.3s ease !important; }
+          .equipment-card.avail:hover { 
+            transform: translateY(-4px); 
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.25) !important; 
+            border-color: rgba(59, 130, 246, 0.4) !important; 
+          }
         `}</style>
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, #0d0d0d 35%, rgba(13,13,13,0.5) 60%, rgba(13,13,13,0) 100%)', pointerEvents: 'none' }} />
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 180, background: 'linear-gradient(to top, #141414 0%, transparent 100%)', pointerEvents: 'none' }} />
@@ -91,17 +102,12 @@ export default function StudentEquipmentPage() {
               margin: '0 0 24px', maxWidth: 540,
               textShadow: '0 2px 10px rgba(0,0,0,0.5)',
             }}>
-              Nền tảng quản lý và chia sẻ thiết bị nội bộ dành riêng cho các thành viên trong câu lạc bộ.
-              Tại đây, bạn có thể dễ dàng tìm kiếm, đăng ký mượn các trang thiết bị cần thiết cho học tập,
-              nghiên cứu và tổ chức sự kiện một cách nhanh chóng và thuận tiện nhất.
+              Nền tảng chia sẻ thiết bị nội bộ, giúp thành viên CLB dễ dàng tìm kiếm và đăng ký mượn trang thiết bị phục vụ học tập, nghiên cứu hay tổ chức sự kiện chỉ với vài thao tác đơn giản.
             </p>
             <div style={{ display: 'flex', gap: 12 }}>
               <button
-                onClick={() => {
-                  const rowsContainer = document.getElementById('equipment-rows');
-                  if (rowsContainer) rowsContainer.scrollIntoView({ behavior: 'smooth' });
-                }}
-                className="btn-primary"
+                onClick={() => navigate('/student/borrow')}
+                className="btn-primary hero-cta-btn"
                 style={{
                   padding: '12px 24px', borderRadius: 8,
                   fontSize: 14, fontWeight: 800, cursor: 'pointer',
@@ -134,7 +140,7 @@ export default function StudentEquipmentPage() {
                 return (
                   <div
                     key={eq.id}
-                    className="movie-card"
+                    className={isAvail ? "movie-card equipment-card avail" : "movie-card equipment-card"}
                     onClick={() => isAvail && setDetailItem(eq)}
                     style={{
                       minWidth: 260, width: 260, flexShrink: 0,
@@ -145,13 +151,14 @@ export default function StudentEquipmentPage() {
                     }}
                   >
                     {/* Image + badge */}
-                    <div style={{ position: 'relative', height: 160, background: '#111', overflow: 'hidden' }}>
+                    <div style={{ position: 'relative', height: 160, background: '#f3f4f6', overflow: 'hidden' }}>
                       {eq.imageUrl ? (
-                        <img src={eq.imageUrl} alt={eq.name}
-                          style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <div style={{ width: '100%', height: '100%', padding: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <img src={eq.imageUrl} alt={eq.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.1))' }} />
+                        </div>
                       ) : (
-                        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#1a1a1a' }}>
-                          <i className="fa-solid fa-box" style={{ color: '#333', fontSize: 28 }} />
+                        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <i className="fa-solid fa-box" style={{ color: '#d1d5db', fontSize: 32 }} />
                         </div>
                       )}
                       {/* Status badge */}
@@ -173,7 +180,7 @@ export default function StudentEquipmentPage() {
 
                       {/* Description */}
                       <div style={{
-                        fontSize: 12, color: '#6b7280', lineHeight: 1.5, marginBottom: 8,
+                        fontSize: 12, color: '#9ca3af', lineHeight: 1.5, marginBottom: 8,
                         display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
                         minHeight: 36,
                       }}>
@@ -230,15 +237,16 @@ export default function StudentEquipmentPage() {
             boxShadow: '0 32px 80px rgba(0,0,0,0.9)',
           }}>
             {/* Image */}
-            <div style={{ position: 'relative', height: 220, background: '#111' }}>
+            <div style={{ position: 'relative', height: 240, background: '#f3f4f6' }}>
               {detailItem.imageUrl ? (
-                <img src={detailItem.imageUrl} alt={detailItem.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <div style={{ width: '100%', height: '100%', padding: 24, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <img src={detailItem.imageUrl} alt={detailItem.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', filter: 'drop-shadow(0 8px 16px rgba(0,0,0,0.15))' }} />
+                </div>
               ) : (
-                <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#1a1a1a' }}>
-                  <i className="fa-solid fa-box" style={{ color: '#333', fontSize: 40 }} />
+                <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <i className="fa-solid fa-box" style={{ color: '#d1d5db', fontSize: 48 }} />
                 </div>
               )}
-              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, #1e1e1e 0%, rgba(30,30,30,0.3) 60%, transparent 100%)' }} />
               <button onClick={() => setDetailItem(null)} style={{
                 position: 'absolute', top: 12, right: 12, width: 32, height: 32,
                 borderRadius: '50%', background: 'rgba(0,0,0,0.65)', border: '1px solid rgba(255,255,255,0.15)',

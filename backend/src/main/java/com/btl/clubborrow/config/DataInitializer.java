@@ -37,21 +37,21 @@ public class DataInitializer implements CommandLineRunner {
             log.info("Created default admin user: admin@club.edu.vn / Admin@123");
         }
 
-        if (!userRepository.existsByEmail("sinhvien@student.edu.vn")) {
+        if (!userRepository.existsByEmail("sinhvien@gmail.com")) {
             userRepository.save(User.builder()
                     .name("Nguyễn Văn An")
-                    .email("sinhvien@student.edu.vn")
+                    .email("sinhvien@gmail.com")
                     .password(passwordEncoder.encode("Student@123"))
                     .role(Role.STUDENT)
                     .studentId("B21DCCC001")
                     .build());
-            log.info("Created default student user: sinhvien@student.edu.vn / Student@123");
+            log.info("Created default student user: sinhvien@gmail.com / Student@123");
         }
 
-        if (!userRepository.existsByEmail("tran.thi.b@student.edu.vn")) {
+        if (!userRepository.existsByEmail("tran.thi.b@gmail.com")) {
             userRepository.save(User.builder()
                     .name("Trần Thị Bình")
-                    .email("tran.thi.b@student.edu.vn")
+                    .email("tran.thi.b@gmail.com")
                     .password(passwordEncoder.encode("Student@123"))
                     .role(Role.STUDENT)
                     .studentId("B21DCCC002")

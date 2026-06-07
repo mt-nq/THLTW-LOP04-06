@@ -1,4 +1,5 @@
 import { Layout, Menu, Dropdown, Avatar, Popover, List, Spin } from 'antd';
+import { useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -26,33 +27,40 @@ export default function AdminLayout() {
   const user = useSelector((state: RootState) => state.auth.user);
   const { data: borrowsRes, isLoading: isBorrowsLoading } = useGetAllBorrowsQuery();
   const pendingBorrows = borrowsRes?.data?.filter(b => b.status === 'PENDING') || [];
-  const pendingCount = pendingBorrows.length;
+  const [clickedIds, setClickedIds] = useState<number[]>([]);
+  
+  const displayPendingCount = pendingBorrows.filter(b => !clickedIds.includes(b.id)).length;
 
   const notifContent = (
     <div style={{ width: 320, maxHeight: 400, overflowY: 'auto' }} className="netflix-scroll">
       <div style={{ padding: '12px 16px', borderBottom: '1px solid rgba(255,255,255,0.07)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <span style={{ fontWeight: 800, color: '#fff', fontSize: 13 }}>Yêu cầu chờ duyệt</span>
-        {pendingCount > 0 && <span style={{ fontSize: 11, color: '#5b5cf0', fontWeight: 700 }}>{pendingCount} đang chờ</span>}
+        {displayPendingCount > 0 && <span style={{ fontSize: 11, color: '#5b5cf0', fontWeight: 700 }}>{displayPendingCount} đang chờ</span>}
       </div>
       {isBorrowsLoading ? (
         <div style={{ display: 'flex', justifyContent: 'center', padding: 32 }}><Spin size="small" /></div>
-      ) : pendingCount === 0 ? (
+      ) : pendingBorrows.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '32px 16px', color: '#4b5563', fontSize: 12 }}>Không có yêu cầu nào đang chờ duyệt</div>
       ) : (
         <List dataSource={pendingBorrows} renderItem={item => (
           <List.Item
-            onClick={() => navigate('/admin/requests')}
-            style={{ padding: '12px 16px', cursor: 'pointer', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'flex-start', gap: 10, transition: 'background 0.2s' }}
+            onClick={() => {
+              if (!clickedIds.includes(item.id)) setClickedIds(prev => [...prev, item.id]);
+              navigate('/admin/requests');
+            }}
+            style={{ padding: '12px 16px', cursor: 'pointer', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'flex-start', gap: 10, transition: 'all 0.2s', opacity: clickedIds.includes(item.id) ? 0.5 : 1 }}
             onMouseEnter={e => ((e.currentTarget as HTMLElement).style.background = 'rgba(91, 92, 240,0.07)')}
             onMouseLeave={e => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
           >
             <ClockCircleFilled style={{ color: '#f59e0b', fontSize: 15, marginTop: 2, flexShrink: 0 }} />
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: '#fff' }}>Yêu cầu từ {item.userName}</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: clickedIds.includes(item.id) ? '#9ca3af' : '#fff', transition: 'color 0.2s' }}>Yêu cầu từ {item.userName}</div>
               <div style={{ fontSize: 11, color: '#6b7280', marginTop: 2 }}>{item.quantity}x {item.equipmentName} ({item.userStudentId || 'N/A'})</div>
               <div style={{ fontSize: 10, color: '#4b5563', marginTop: 4 }}>{dayjs(item.createdAt).format('HH:mm DD/MM/YYYY')}</div>
             </div>
-            <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#5b5cf0', flexShrink: 0, marginTop: 4 }} />
+            {!clickedIds.includes(item.id) && (
+              <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#5b5cf0', flexShrink: 0, marginTop: 4 }} />
+            )}
           </List.Item>
         )} />
       )}
@@ -123,9 +131,9 @@ export default function AdminLayout() {
                 onMouseEnter={e => (e.currentTarget.style.color = '#e5e7eb')}
                 onMouseLeave={e => (e.currentTarget.style.color = '#6b7280')}>
                 <i className="fa-solid fa-bell" style={{ fontSize: 17 }} />
-                {pendingCount > 0 && (
+                {displayPendingCount > 0 && (
                   <span style={{ position: 'absolute', top: -6, right: -6, background: '#ef4444', color: '#fff', fontSize: 9, fontWeight: 800, padding: '1px 5px', borderRadius: 10, lineHeight: 1.5 }}>
-                    {pendingCount}
+                    {displayPendingCount}
                   </span>
                 )}
               </div>

@@ -208,7 +208,7 @@ export default function LoginPage() {
 
       {/* Footer */}
       <div style={{ position: 'relative', zIndex: 10, textAlign: 'center', padding: '16px', color: '#374151', fontSize: 12 }}>
-        CLB Borrow Management System © 2025
+        CLB Borrow Management System © 2026
       </div>
     </div>
   );

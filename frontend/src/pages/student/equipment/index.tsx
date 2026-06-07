@@ -97,10 +97,7 @@ export default function StudentEquipmentPage() {
             </p>
             <div style={{ display: 'flex', gap: 12 }}>
               <button
-                onClick={() => {
-                  const rowsContainer = document.getElementById('equipment-rows');
-                  if (rowsContainer) rowsContainer.scrollIntoView({ behavior: 'smooth' });
-                }}
+                onClick={() => navigate('/student/borrow')}
                 className="btn-primary"
                 style={{
                   padding: '12px 24px', borderRadius: 8,

@@ -18,6 +18,8 @@ export default function HistoryPage() {
   const [statusFilter, setStatusFilter] = useState<BorrowStatus | 'ALL'>('ALL');
   const [searchText, setSearchText] = useState('');
   const [dateRange, setDateRange] = useState<any>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
   
   const [extendModalVisible, setExtendModalVisible] = useState(false);
   const [extendRecord, setExtendRecord] = useState<BorrowResponse | null>(null);
@@ -89,7 +91,7 @@ export default function HistoryPage() {
     {
       title: 'STT', key: 'index', width: 48, align: 'center' as const,
       render: (_: unknown, __: unknown, i: number) => (
-        <span style={{ fontSize: 12, color: '#4b5563', fontWeight: 700 }}>{i + 1}</span>
+        <span style={{ fontSize: 12, color: '#4b5563', fontWeight: 700 }}>{(currentPage - 1) * pageSize + i + 1}</span>
       ),
     },
     {
@@ -272,7 +274,7 @@ export default function HistoryPage() {
               className="dark-filter-input"
               prefix={<i className="fa-solid fa-magnifying-glass" style={{ color: '#6b7280', fontSize: 13 }} />}
               value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
+              onChange={(e) => { setSearchText(e.target.value); setCurrentPage(1); }}
               style={{ width: 200, background: '#1a1a1a', borderColor: 'rgba(255,255,255,0.08)', color: '#fff' }}
               allowClear
             />
@@ -281,7 +283,7 @@ export default function HistoryPage() {
               size="large"
               className="dark-filter-input"
               value={dateRange}
-              onChange={(dates) => setDateRange(dates)}
+              onChange={(dates) => { setDateRange(dates); setCurrentPage(1); }}
               style={{ width: 260, background: '#1a1a1a', borderColor: 'rgba(255,255,255,0.08)', color: '#fff' }}
               placeholder={['Từ ngày', 'Đến ngày']}
               allowClear
@@ -290,7 +292,7 @@ export default function HistoryPage() {
               value={statusFilter}
               size="large"
               className="dark-filter-input"
-              onChange={setStatusFilter}
+              onChange={(val) => { setStatusFilter(val); setCurrentPage(1); }}
               style={{ width: 170 }}
               options={[
                 { value: 'ALL', label: 'Tất cả trạng thái' },
@@ -336,7 +338,9 @@ export default function HistoryPage() {
             rowKey="id"
             scroll={{ x: 700 }}
             pagination={{
-              pageSize: 10,
+              current: currentPage,
+              pageSize: pageSize,
+              onChange: (page) => setCurrentPage(page),
               style: { padding: '12px 20px' },
             }}
             locale={{

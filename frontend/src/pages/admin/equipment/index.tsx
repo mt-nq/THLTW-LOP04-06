@@ -180,6 +180,7 @@ export default function AdminEquipmentPage() {
         footer={null}
         width={560}
         wrapClassName="dark-modal"
+        centered
       >
         <Form form={form} layout="vertical" onFinish={handleSubmit} className="mt-4" requiredMark={false}>
           <Form.Item name="name" label="Tên thiết bị" rules={[{ required: true, message: 'Vui lòng nhập tên thiết bị' }]}>
@@ -216,6 +217,7 @@ export default function AdminEquipmentPage() {
         onCancel={() => setDetailItem(null)}
         footer={null}
         wrapClassName="dark-modal"
+        centered
       >
         {detailItem && (
           <div className="mt-4">

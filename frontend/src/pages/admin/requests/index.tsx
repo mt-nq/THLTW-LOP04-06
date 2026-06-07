@@ -223,6 +223,7 @@ export default function AdminRequestsPage() {
         okText="Xác nhận duyệt"
         cancelText="Huỷ"
         wrapClassName="dark-modal"
+        centered
       >
         <div className="p-4 bg-white/5 rounded-lg border border-white/5 mt-4">
           <p className="mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Nhập ghi chú gửi sinh viên (Tuỳ chọn):</p>
@@ -245,6 +246,7 @@ export default function AdminRequestsPage() {
         okText="Từ chối yêu cầu"
         cancelText="Huỷ"
         wrapClassName="dark-modal"
+        centered
       >
         <div className="p-4 bg-white/5 rounded-lg border border-white/5 mt-4">
           <p className="mb-2 text-xs font-bold text-gray-400 uppercase tracking-wider">Lý do từ chối (Tuỳ chọn):</p>
@@ -265,6 +267,7 @@ export default function AdminRequestsPage() {
         onCancel={() => setDetailModal(null)}
         footer={null}
         wrapClassName="dark-modal"
+        centered
       >
         {detailModal && (
           <div className="mt-4 space-y-4">

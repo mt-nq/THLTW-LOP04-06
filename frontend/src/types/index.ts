@@ -68,6 +68,7 @@ export interface BorrowResponse {
   status: BorrowStatus;
   note?: string;
   adminNote?: string;
+  isExtended: boolean;
   createdAt: string;
 }
 
@@ -79,8 +80,12 @@ export interface BorrowCreateRequest {
   note?: string;
 }
 
+export interface ExtendBorrowRequest {
+  days: number;
+}
+
 // ===== Notification =====
-export type NotificationType = 'APPROVED' | 'REJECTED' | 'RETURN_REMINDER' | 'OVERDUE_WARNING';
+export type NotificationType = 'APPROVED' | 'REJECTED' | 'RETURN_REMINDER' | 'OVERDUE_WARNING' | 'EXTENDED';
 
 export interface NotificationItem {
   id: number;

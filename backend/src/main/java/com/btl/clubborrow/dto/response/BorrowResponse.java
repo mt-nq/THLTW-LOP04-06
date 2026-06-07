@@ -32,5 +32,6 @@ public class BorrowResponse {
     private BorrowStatus status;
     private String note;
     private String adminNote;
+    private boolean isExtended;
     private LocalDateTime createdAt;
 }

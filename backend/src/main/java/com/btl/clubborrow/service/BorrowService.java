@@ -1,6 +1,7 @@
 package com.btl.clubborrow.service;
 
 import com.btl.clubborrow.dto.request.BorrowCreateRequest;
+import com.btl.clubborrow.dto.request.ExtendBorrowRequest;
 import com.btl.clubborrow.dto.request.RejectRequest;
 import com.btl.clubborrow.dto.request.ApproveRequest;
 import com.btl.clubborrow.dto.response.BorrowResponse;
@@ -64,6 +65,48 @@ public class BorrowService {
 
         return borrowRequestRepository.findByUserIdOrderByCreatedAtDesc(userId)
                 .stream().map(this::toResponse).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public BorrowResponse extendBorrowRequest(Long id, Long userId, ExtendBorrowRequest request) {
+        BorrowRequest borrow = getBorrowOrThrow(id);
+
+        if (!borrow.getUser().getId().equals(userId)) {
+            throw new RuntimeException("Bạn không có quyền gia hạn phiếu mượn này");
+        }
+
+        if (borrow.getStatus() != BorrowStatus.APPROVED) {
+            throw new RuntimeException("Chỉ có thể gia hạn khi thiết bị đang được mượn");
+        }
+
+        if (borrow.isExtended()) {
+            throw new RuntimeException("Phiếu mượn này đã được gia hạn trước đó, không thể gia hạn thêm");
+        }
+
+        LocalDate now = LocalDate.now();
+        LocalDate returnDate = borrow.getReturnDate();
+        
+        // Chỉ cho phép gia hạn nếu còn <= 3 ngày so với ngày trả, và chưa quá hạn
+        if (now.isAfter(returnDate)) {
+            throw new RuntimeException("Thiết bị đã quá hạn, không thể gia hạn");
+        }
+        if (now.plusDays(3).isBefore(returnDate)) {
+            throw new RuntimeException("Chỉ có thể gia hạn khi thời gian trả còn từ 3 ngày trở xuống");
+        }
+
+        borrow.setReturnDate(returnDate.plusDays(request.getDays()));
+        borrow.setExtended(true);
+        borrowRequestRepository.save(borrow);
+
+        // Gửi thông báo in-app
+        notificationService.createNotification(
+            borrow.getUser().getId(),
+            "🔄 Gia hạn thành công",
+            "Bạn đã gia hạn thành công " + borrow.getEquipment().getName() + " thêm " + request.getDays() + " ngày. Hạn trả mới: " + borrow.getReturnDate().format(DATE_FMT),
+            NotificationType.EXTENDED
+        );
+
+        return toResponse(borrow);
     }
 
     // ===== Admin =====
@@ -189,6 +232,7 @@ public class BorrowService {
                 .status(b.getStatus())
                 .note(b.getNote())
                 .adminNote(b.getAdminNote())
+                .isExtended(b.isExtended())
                 .createdAt(b.getCreatedAt())
                 .build();
     }

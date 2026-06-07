@@ -1,6 +1,7 @@
 package com.btl.clubborrow.controller;
 
 import com.btl.clubborrow.dto.request.BorrowCreateRequest;
+import com.btl.clubborrow.dto.request.ExtendBorrowRequest;
 import com.btl.clubborrow.dto.request.RejectRequest;
 import com.btl.clubborrow.dto.request.ApproveRequest;
 import com.btl.clubborrow.dto.response.ApiResponse;
@@ -47,6 +48,16 @@ public class BorrowController {
             @AuthenticationPrincipal User user) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Gửi yêu cầu mượn thành công", borrowService.createRequest(request, user.getId())));
+    }
+
+    // Sinh viên: gia hạn mượn thiết bị
+    @PostMapping("/{id}/extend")
+    @PreAuthorize("hasRole('STUDENT')")
+    public ResponseEntity<ApiResponse<BorrowResponse>> extend(
+            @PathVariable Long id,
+            @Valid @RequestBody ExtendBorrowRequest request,
+            @AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(ApiResponse.success("Gia hạn thành công", borrowService.extendBorrowRequest(id, user.getId(), request)));
     }
 
     // Admin: duyệt yêu cầu

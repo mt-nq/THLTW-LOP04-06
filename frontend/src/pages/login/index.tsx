@@ -135,7 +135,11 @@ export default function LoginPage() {
                 <Form.Item name="studentId" rules={[{ required: true, message: 'Vui lòng nhập MSSV' }]}>
                   <Input prefix={<IdcardOutlined style={{ color: '#4b5563' }} />} placeholder="Mã số sinh viên" style={inputStyle} />
                 </Form.Item>
-                <Form.Item name="email" rules={[{ required: true, message: 'Vui lòng nhập email' }, { type: 'email', message: 'Email không hợp lệ' }]}>
+                <Form.Item name="email" rules={[
+                  { required: true, message: 'Vui lòng nhập email' },
+                  { type: 'email', message: 'Email không hợp lệ' },
+                  { pattern: /^[A-Za-z0-9+_.-]+@gmail\.com$/, message: 'Email bắt buộc phải có đuôi @gmail.com' }
+                ]}>
                   <Input prefix={<MailOutlined style={{ color: '#4b5563' }} />} placeholder="Email" style={inputStyle} />
                 </Form.Item>
                 <Form.Item name="password" rules={[{ required: true, message: 'Vui lòng nhập mật khẩu' }, { min: 6, message: 'Tối thiểu 6 ký tự' }]}>

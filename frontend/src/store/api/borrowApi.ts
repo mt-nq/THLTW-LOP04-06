@@ -1,5 +1,5 @@
 import { baseApi } from './baseApi';
-import { ApiResponse, BorrowResponse, BorrowCreateRequest } from '@/types';
+import { ApiResponse, BorrowResponse, BorrowCreateRequest, ExtendBorrowRequest } from '@/types';
 
 export const borrowApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -27,6 +27,10 @@ export const borrowApi = baseApi.injectEndpoints({
       query: (id) => ({ url: `/api/borrows/${id}/return`, method: 'PUT' }),
       invalidatesTags: ['Borrow', 'Equipment', 'Statistics'],
     }),
+    extendBorrow: builder.mutation<ApiResponse<BorrowResponse>, { id: number; data: ExtendBorrowRequest }>({
+      query: ({ id, data }) => ({ url: `/api/borrows/${id}/extend`, method: 'POST', body: data }),
+      invalidatesTags: ['Borrow'],
+    }),
   }),
 });
 
@@ -37,4 +41,5 @@ export const {
   useApproveBorrowMutation,
   useRejectBorrowMutation,
   useReturnBorrowMutation,
+  useExtendBorrowMutation,
 } = borrowApi;

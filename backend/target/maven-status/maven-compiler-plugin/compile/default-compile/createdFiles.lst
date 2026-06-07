@@ -23,6 +23,7 @@ com\btl\clubborrow\security\JwtAuthFilter.class
 com\btl\clubborrow\dto\response\NotificationResponse.class
 com\btl\clubborrow\security\UserDetailsServiceImpl.class
 com\btl\clubborrow\security\JwtTokenProvider.class
+com\btl\clubborrow\dto\request\ExtendBorrowRequest$ExtendBorrowRequestBuilder.class
 com\btl\clubborrow\service\EquipmentService.class
 com\btl\clubborrow\config\SecurityConfig.class
 com\btl\clubborrow\entity\User.class
@@ -36,6 +37,7 @@ com\btl\clubborrow\repository\UserRepository.class
 com\btl\clubborrow\service\BorrowService.class
 com\btl\clubborrow\entity\Equipment$EquipmentBuilder.class
 com\btl\clubborrow\dto\request\BorrowCreateRequest.class
+com\btl\clubborrow\dto\request\ExtendBorrowRequest.class
 com\btl\clubborrow\dto\request\RejectRequest.class
 com\btl\clubborrow\entity\BorrowRequest$BorrowRequestBuilder.class
 com\btl\clubborrow\dto\response\EquipmentResponse$EquipmentResponseBuilder.class

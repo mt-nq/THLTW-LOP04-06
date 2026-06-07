@@ -11,6 +11,7 @@ public class RegisterRequest {
 
     @NotBlank(message = "Email không được để trống")
     @Email(message = "Email không hợp lệ")
+    @jakarta.validation.constraints.Pattern(regexp = "^[A-Za-z0-9+_.-]+@gmail\\.com$", message = "Email bắt buộc phải có đuôi @gmail.com")
     private String email;
 
     @NotBlank(message = "Mật khẩu không được để trống")

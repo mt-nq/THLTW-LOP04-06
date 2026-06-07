@@ -36,7 +36,7 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private Role role;
 
-    @Column(name = "student_id")
+    @Column(name = "student_id", unique = true)
     private String studentId;
 
     @CreationTimestamp
